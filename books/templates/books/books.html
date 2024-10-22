@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block title %}Список книг{% endblock %}
+
+{% block content %}
+    <h1>Список книг</h1>
+    <ul>
+        {% for book in books %}
+            <li>
+                <h2>{{ book.title }}</h2>
+                <p>Авторы: {% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                <p>{{ book.summary }}</p>
+                <p>{{ book.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
