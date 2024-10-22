@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block title %}Список прочитанного для {{ user.username }}{% endblock %}
+
+{% block content %}
+    <h1>Список прочитанного для {{ user.username }}</h1>
+    <ul>
+        {% for item in reading_list %}
+            <li>
+                <h2>{{ item.book.title }}</h2>
+                <p>Авторы: {% for author in item.book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                <p>Дата прочтения: {{ item.read_date }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
