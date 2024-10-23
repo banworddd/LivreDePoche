@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractUser
 from books.models import Book
 
 class CustomUser(AbstractUser):
-
     def __str__(self):
         return self.username
 
@@ -40,4 +39,4 @@ class BookReview(models.Model):
     review_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.user.username} says {self.review_text} on {self.review_date}'
+        return f'{self.user.username} says "{self.review_text}" on {self.review_date}'

@@ -3,12 +3,20 @@
 {% block title %}Список авторов{% endblock %}
 
 {% block content %}
-    <h1>Список Авторовг</h1>
-    <ul>
+    <!-- Заголовок страницы со списком авторов -->
+    <h1 style="text-align: center;">Список Авторов</h1>
+
+    <!-- Список авторов -->
+    <ul style="list-style-type: none; padding: 0; max-width: 800px; margin: 0 auto;">
         {% for author in authors %}
-            <li>
+            <li style="margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                <!-- Имя автора с ссылкой на страницу деталей -->
                 <h2><a href="{% url 'author_detail' author.id %}">{{ author.name }}</a></h2>
-                <p>Годы жизни: {{ author.date_of_birth }} - {{ author.date_of_death }}</p>
+
+                <!-- Информация о годах жизни автора -->
+                <p><strong>Годы жизни:</strong> {{ author.date_of_birth }} - {{ author.date_of_death }}</p>
+
+                <!-- Краткая биография автора -->
                 <p>{{ author.bio }}</p>
             </li>
         {% endfor %}

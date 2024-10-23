@@ -4,9 +4,40 @@
 
 {% block content %}
     <h2>Вход</h2>
+
+    {% if form.non_field_errors %}
+        <div class="error-message">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        {{ form.username.label_tag }}  <!-- Ярлык для поля имени пользователя -->
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="error-message">
+                {{ form.username.errors }}
+            </div>
+        {% endif %}
+
+        {{ form.password.label_tag }}  <!-- Ярлык для поля пароля -->
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div class="error-message">
+                {{ form.password.errors }}
+            </div>
+        {% endif %}
+
+        <div>
+            <label>
+                <input type="checkbox" name="remember_me"> Запомнить меня
+            </label>
+        </div>
+
         <button type="submit">Войти</button>
     </form>
+
+    <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
 {% endblock %}

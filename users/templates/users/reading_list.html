@@ -13,8 +13,8 @@
                 {% for book, data in books.items %}
                     <li>
                         <h4>{{ book }}</h4>
-                        <p>Оценка: {{ data.0 }}</p>
-                        <p>Дата прочтения: {{ data.1 }}</p>
+                        <p>Оценка: {{ data.0|default:"Не указана" }}</p>
+                        <p>Дата прочтения: {{ data.1|date:"d.m.Y"|default:"Не указана" }}</p>
                     </li>
                 {% endfor %}
             </ul>
@@ -22,33 +22,4 @@
     {% else %}
         <p>Нет прочитанных книг</p>
     {% endif %}
-
-    <h2>Читаемое сейчас</h2>
-    {% if currently_reading_dict %}
-        {% for author, books in currently_reading_dict.items %}
-            <h3>{{ author }}</h3>
-            <ul>
-                {% for book in books %}
-                    <li>{{ book }}</li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    {% else %}
-        <p>Нет книг, которые читаются сейчас</p>
-    {% endif %}
-
-    <h2>Запланированное к прочтению</h2>
-    {% if planned_reading_dict %}
-        {% for author, books in planned_reading_dict.items %}
-            <h3>{{ author }}</h3>
-            <ul>
-                {% for book in books %}
-                    <li>{{ book }}</li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    {% else %}
-        <p>Нет книг, запланированных к прочтению</p>
-    {% endif %}
-
 {% endblock %}

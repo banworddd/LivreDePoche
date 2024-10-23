@@ -3,14 +3,28 @@
 {% block title %}Список книг{% endblock %}
 
 {% block content %}
-    <h1>Список книг</h1>
-    <ul>
+    <!-- Заголовок страницы -->
+    <h1 style="text-align: center;">Список книг</h1>
+
+    <!-- Список книг -->
+    <ul style="list-style-type: none; padding: 0;">
         {% for book in books %}
-            <li>
+            <li style="margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                <!-- Заголовок книги с ссылкой на детали -->
                 <h2><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h2>
-                <p>Авторы: {% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-                <p>{{ book.summary }}</p>
-                <p>{{ book.description }}</p>
+
+                <!-- Список авторов -->
+                <p><strong>Авторы:</strong>
+                    {% for author in book.authors.all %}
+                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+
+                <!-- Краткое описание книги -->
+                <p><strong>Краткое описание:</strong> {{ book.summary }}</p>
+
+                <!-- Полное описание книги -->
+                <p><strong>Описание:</strong> {{ book.description }}</p>
             </li>
         {% endfor %}
     </ul>

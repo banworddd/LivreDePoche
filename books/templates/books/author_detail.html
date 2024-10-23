@@ -3,9 +3,16 @@
 {% block title %}{{ author.name }}{% endblock %}
 
 {% block content %}
-    <h1>{{ author.name }}</h1>
-    <p><strong>Годы жизни:</strong>
-            {{ author.date_of_birth }} - {{ author.date_of_death }}
+    <!-- Заголовок страницы с именем автора -->
+    <h1 style="text-align: center;">{{ author.name }}</h1>
+
+    <!-- Информация о годах жизни автора -->
+    <p style="text-align: center;"><strong>Годы жизни:</strong>
+        {{ author.date_of_birth }} - {{ author.date_of_death }}
     </p>
-    <p><strong>Биография:</strong> {{ author.bio }}</p>
+
+    <!-- Биография автора -->
+    <div style="margin: 0 auto; width: 80%; text-align: justify;">
+        <p><strong>Биография:</strong> {{ author.bio }}</p>
+    </div>
 {% endblock %}
