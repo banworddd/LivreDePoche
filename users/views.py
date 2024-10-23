@@ -2,11 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser, ReadingList
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from books.models import Book
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -15,12 +16,12 @@ def register(request):
             login(request, user)
             return redirect('')  # Перенаправление на главную страницу после регистрации
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -29,7 +30,7 @@ def user_login(request):
                 login(request, user)
                 return redirect('')  # Перенаправление на главную страницу после входа
     else:
-        form = AuthenticationForm()
+        form = CustomAuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
 
 def user_logout(request):
