@@ -7,7 +7,7 @@
     <ul>
         {% for book in books %}
             <li>
-                <h2>{{ book.title }}</h2>
+                <h2><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h2>
                 <p>Авторы: {% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                 <p>{{ book.summary }}</p>
                 <p>{{ book.description }}</p>

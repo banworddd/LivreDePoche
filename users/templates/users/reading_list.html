@@ -4,13 +4,51 @@
 
 {% block content %}
     <h1>Список прочитанного для {{ user.username }}</h1>
-    <ul>
-        {% for item in reading_list %}
-            <li>
-                <h2>{{ item.book.title }}</h2>
-                <p>Авторы: {% for author in item.book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-                <p>Дата прочтения: {{ item.read_date }}</p>
-            </li>
+
+    <h2>Прочитанное</h2>
+    {% if reading_dict %}
+        {% for author, books in reading_dict.items %}
+            <h3>{{ author }}</h3>
+            <ul>
+                {% for book, data in books.items %}
+                    <li>
+                        <h4>{{ book }}</h4>
+                        <p>Оценка: {{ data.0 }}</p>
+                        <p>Дата прочтения: {{ data.1 }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endfor %}
-    </ul>
+    {% else %}
+        <p>Нет прочитанных книг</p>
+    {% endif %}
+
+    <h2>Читаемое сейчас</h2>
+    {% if currently_reading_dict %}
+        {% for author, books in currently_reading_dict.items %}
+            <h3>{{ author }}</h3>
+            <ul>
+                {% for book in books %}
+                    <li>{{ book }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% else %}
+        <p>Нет книг, которые читаются сейчас</p>
+    {% endif %}
+
+    <h2>Запланированное к прочтению</h2>
+    {% if planned_reading_dict %}
+        {% for author, books in planned_reading_dict.items %}
+            <h3>{{ author }}</h3>
+            <ul>
+                {% for book in books %}
+                    <li>{{ book }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% else %}
+        <p>Нет книг, запланированных к прочтению</p>
+    {% endif %}
+
 {% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ author.name }}{% endblock %}
+
+{% block content %}
+    <h1>{{ author.name }}</h1>
+    <p><strong>Годы жизни:</strong>
+            {{ author.date_of_birth }} - {{ author.date_of_death }}
+    </p>
+    <p><strong>Биография:</strong> {{ author.bio }}</p>
+{% endblock %}
