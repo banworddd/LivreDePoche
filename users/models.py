@@ -9,8 +9,8 @@ class CustomUser(AbstractUser):
         return self.username
 
 class ReadingList(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reading_list')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reading_entries')
     rating = models.IntegerField(null=True, blank=True)
     read_date = models.DateField(null=True, blank=True)
 
