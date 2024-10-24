@@ -18,15 +18,15 @@ class ReadingList(models.Model):
         return f"{self.user.username} read {self.book.title}"
 
 class CurrentlyReadingList(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='currently_reading_list')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='currently_read_by_users')
 
     def __str__(self):
         return f"{self.user.username} is reading {self.book.title}"
 
 class PlannedReadingList(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='planned_reading_list')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='planned_by_users')
 
     def __str__(self):
         return f"{self.user.username} plans to read {self.book.title}"

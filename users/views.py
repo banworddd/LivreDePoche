@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 
-from .models import CustomUser, ReadingList, CurrentlyReadingList, PlannedReadingList
+from .models import CustomUser
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
 
@@ -36,8 +36,9 @@ def user_logout(request):
 
 def reading_list(request, username):
     user = get_object_or_404(CustomUser, username=username)
-    reading_list = ReadingList.objects.filter(user=user)
 
+    # Прочитанное
+    reading_list = user.reading_list.all()
     reading_dict = {}
     for item in reading_list:
         author_name = item.book.authors.first().name if item.book.authors.exists() else 'Неизвестный автор'
@@ -45,8 +46,16 @@ def reading_list(request, username):
             reading_dict[author_name] = {}
         reading_dict[author_name][item.book.title] = [item.rating, item.read_date]
 
+    # Читается сейчас
+    currently_reading_list = user.currently_reading_list.all()
+
+    # Планируется к прочтению
+    planned_reading_list = user.planned_reading_list.all()
+
     return render(request, 'users/reading_list.html', {
         'user': user,
-        'reading_dict': reading_dict
+        'reading_dict': reading_dict,
+        'currently_reading_list': currently_reading_list,
+        'planned_reading_list': planned_reading_list,
     })
 
