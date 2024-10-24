@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block title %}Подтверждение удаления{% endblock %}
+
+{% block content %}
+    <h1>Подтверждение удаления</h1>
+    <p>Вы уверены, что хотите удалить книгу "{{ reading_entry.book.title }}" из списка прочитанного?</p>
+    <p>При этом будет также удален ваш отзыв: "{{ reading_entry.rating }}".</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="confirm_delete_review" value="{{ reading_entry.id }}">Удалить и отзыв</button>
+        <button type="button" onclick="window.history.back();">Отмена</button>
+    </form>
+{% endblock %}

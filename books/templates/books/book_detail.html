@@ -72,7 +72,7 @@
         <ul style="list-style-type: none; padding: 0;">
             {% for review in reviews %}
                 <li style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
-                    <p><strong>{{ review.user.username }}</strong> (оценка: {{ review.rating }})</p>
+                    <strong><a href="{% url 'reading_list' review.user.username %}">{{ review.user.username }}</a></strong>(оценка: {{ review.rating }})
                     <p>{{ review.review_text }}</p>
                     <p><em>Дата отзыва: {{ review.review_date }}</em></p>
                 </li>
