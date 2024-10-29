@@ -1,6 +1,3 @@
-import requests
-import json
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib import messages
@@ -42,7 +39,7 @@ class UserLogin(APIView):
         try:
             if serializer.is_valid():
                 email = serializer.validated_data['email']
-                password = serializer.validated_data['password']
+                #password = serializer.validated_data['password']
 
                 user = CustomUser.objects.get(email=email)
 
@@ -63,8 +60,8 @@ def register(request):
 def send_welcome_email(user):
     subject = 'Добро пожаловать в наш сервис!'
     message = f'Привет, {user.username}! Спасибо за регистрацию.'
-    email_from = settings.EMAIL_HOST_USER  # Это будет игнорироваться с console.EmailBackend
-    recipient_list = [user.email]  # Это тоже будет игнорироваться
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]
 
     send_mail(subject, message, email_from, recipient_list)
 
