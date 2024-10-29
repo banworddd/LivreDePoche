@@ -5,6 +5,11 @@ from django.contrib.auth.models import AbstractUser
 from books.models import Book
 
 class CustomUser(AbstractUser):
+    username = models.CharField(max_length=30, unique=True)
+    avatar = models.ImageField(upload_to='avatars', default='avatars/default.png')
+    bio = models.TextField(max_length=250, blank=True, null=True)
+    email = models.EmailField(unique=True)
+
     def __str__(self):
         return self.username
 

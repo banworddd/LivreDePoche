@@ -4,7 +4,7 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = UserCreationForm.Meta.fields + ('email',)
+        fields = ('username', 'email', 'password1', 'password2')
 
 class CustomAuthenticationForm(AuthenticationForm):
     class Meta:
@@ -13,6 +13,6 @@ class CustomAuthenticationForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Здесь можно добавить дополнительные настройки формы, если необходимо
+
 
 

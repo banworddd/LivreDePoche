@@ -1,33 +1,75 @@
+import requests
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
 
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.renderers import JSONRenderer
+
+from .serializers import UserSerializer, LoginSerializer
 from .models import CustomUser, ReadingList, CurrentlyReadingList, PlannedReadingList, BookReview
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+
+
+class UserRegistration(APIView):
+    renderer_classes = [JSONRenderer]
+
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        try:
+            if serializer.is_valid():
+                user = serializer.save()
+                login(request, user)
+                send_welcome_email(user)
+                return Response({"status": "User created", "id": user.id}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print("Error in UserRegistration API:", e)
+            return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserLogin(APIView):
+    renderer_classes = [JSONRenderer]
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        try:
+            if serializer.is_valid():
+                email = serializer.validated_data['email']
+                password = serializer.validated_data['password']
+
+                user = CustomUser.objects.get(email=email)
+
+                login(request, user)
+
+                return Response({"status": "Login successful"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print("Error in UserLogin API:", e)
+            return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Вход пользователя сразу после регистрации
-            return redirect('index')  # Перенаправление на главную страницу после регистрации
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'users/register.html')
 
+def send_welcome_email(user):
+    subject = 'Добро пожаловать в наш сервис!'
+    message = f'Привет, {user.username}! Спасибо за регистрацию.'
+    email_from = settings.EMAIL_HOST_USER  # Это будет игнорироваться с console.EmailBackend
+    recipient_list = [user.email]  # Это тоже будет игнорироваться
+
+    send_mail(subject, message, email_from, recipient_list)
 
 def user_login(request):
-    if request.method == 'POST':
-        form = CustomAuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()  # Получение пользователя из формы
-            login(request, user)
-            return redirect('index')  # Перенаправление на главную страницу после входа
-    else:
-        form = CustomAuthenticationForm()
-    return render(request, 'users/login.html', {'form': form})
-
+    return render(request, 'users/login.html')
 
 def user_logout(request):
     logout(request)
