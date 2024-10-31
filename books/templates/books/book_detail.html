@@ -3,82 +3,93 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block content %}
-    <!-- Заголовок книги -->
-    <h1 style="text-align: center;">{{ book.title }}</h1>
+<h2 id="book-title"></h2>
+<p><strong>Автор:</strong> <span id="book-authors"></span></p>
+<p><strong>Описание:</strong> <span id="book-description"></span></p>
+<p><strong>Жанры:</strong> <span id="book-genres"></span></p>
 
-    <!-- Информация о книге -->
-    <section>
-        <p><strong>Авторы:</strong>
-            {% for author in book.authors.all %}
-                {{ author.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
+<h3>Отзывы</h3>
+<ul id="reviews-list">
+    {% for review in reviews %}
+    <li>
+        <strong>{{ review.user.username }}</strong> - {{ review.rating }}⭐
+        <p>{{ review.review_text }}</p>
+    </li>
+    {% empty %}
+    <li>Нет отзывов для этой книги.</li>
+    {% endfor %}
+</ul>
 
-        <p><strong>Жанры:</strong>
-            {% for genre in book.genre.all %}
-                {{ genre.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
+{% if user.is_authenticated %}
+<div id="reading-list-buttons">
+    <h3>Добавить в список</h3>
+    <button id="add-to-wishlist" data-status="planned">Добавить в список желаемого</button>
+    <button id="add-to-reading" data-status="currently_reading">Добавить в список читаемого</button>
+    <button id="add-to-completed" data-status="completed">Добавить в список прочитанного</button>
+</div>
+{% endif %}
 
-        <p><strong>Краткое описание:</strong> {{ book.summary }}</p>
-        <p><strong>Описание:</strong> {{ book.description }}</p>
-    </section>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const bookId = "{{ book.id }}";
 
-    <!-- Кнопки для добавления книги в списки доступны только для аутентифицированных пользователей -->
+    // Функция для получения данных о книге через API
+    function fetchBookDetails() {
+        fetch(`/api/book/${bookId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сети');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Обновляем содержимое на странице
+                document.getElementById('book-title').textContent = data.title;
+                document.getElementById('book-description').textContent = data.description;
+
+                const authorNames = data.authors.map(author => author.name).join(', ');
+                document.getElementById('book-authors').textContent = authorNames;
+
+                const genreNames = data.genre.map(genre => genre.name).join(', ');
+                document.getElementById('book-genres').textContent = genreNames;
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+
+    // Получаем данные о книге при загрузке страницы
+    fetchBookDetails();
+
     {% if user.is_authenticated %}
-        <h3>Добавить в мой список</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <div>
-                {% if not is_read %}
-                    <button type="submit" name="action" value="read">Добавить в прочитанное</button>
-                {% endif %}
-                {% if not is_reading %}
-                    <button type="submit" name="action" value="reading">Добавить в читается сейчас</button>
-                {% endif %}
-                {% if not is_planned %}
-                    <button type="submit" name="action" value="planned">Добавить в планируется к прочтению</button>
-                {% endif %}
-            </div>
-        </form>
+    const buttons = document.querySelectorAll("button[data-status]");
 
-        <!-- Форма для добавления отзыва, если книга уже прочитана -->
-        {% if is_read %}
-            <h3>Оставить отзыв</h3>
-            {% if existing_review %}
-                <p>Вы уже оставили отзыв на эту книгу. Чтобы изменить его, введите новую оценку и текст отзыва:</p>
-                <p>Текущая оценка: {{ existing_review.rating }}</p>
-                <p>Текущий отзыв: {{ existing_review.review_text }}</p>
-            {% endif %}
-            <form method="POST" action="{% url 'add_review' book.id %}">
-                {% csrf_token %}
-                <label for="rating">Оценка (1-5):</label>
-                <input type="number" id="rating" name="rating" min="1" max="5" value="{{ existing_review.rating|default_if_none:'' }}" required>
+    buttons.forEach(button => {
+        button.addEventListener("click", function() {
+            const status = this.getAttribute("data-status");
 
-                <label for="review_text">Текст отзыва:</label>
-                <textarea id="review_text" name="review_text" required>{{ existing_review.review_text|default_if_none:'' }}</textarea>
-
-                <button type="submit">Сохранить отзыв</button>
-            </form>
-        {% endif %}
-    {% else %}
-        <!-- Сообщение для неаутентифицированных пользователей -->
-        <p>Чтобы добавить книгу в свой список или оставить отзыв, пожалуйста, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>.</p>
+            fetch(`/api/reading_list/{{ user.username }}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    book: bookId,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    console.log("Книга успешно добавлена в список:", data);
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+        });
+    });
     {% endif %}
+});
+</script>
 
-    <!-- Отзывы пользователей -->
-    <h2>Отзывы</h2>
-    {% if reviews %}
-        <ul style="list-style-type: none; padding: 0;">
-            {% for review in reviews %}
-                <li style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
-                    <strong><a href="{% url 'reading_list' review.user.username %}">{{ review.user.username }}</a></strong>(оценка: {{ review.rating }})
-                    <p>{{ review.review_text }}</p>
-                    <p><em>Дата отзыва: {{ review.review_date }}</em></p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Отзывов на эту книгу пока нет.</p>
-    {% endif %}
 {% endblock %}

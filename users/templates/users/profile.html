@@ -1,0 +1,227 @@
+{% extends 'layout.html' %}
+
+{% block title %}Профиль пользователя: {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<h2>{{ profile_user.username }}'s Профиль</h2>
+
+<div id="user-info">
+    <h3>Информация о пользователе</h3>
+    <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
+    <p><strong>Биография:</strong> <span id="user-bio">Загрузка...</span></p>
+
+    <div id="user-avatar">
+        <img src="" alt="Avatar" style="width: 100px; height: 100px; display: none;" id="avatar-image">
+    </div>
+
+    {% if is_owner %}
+    <h4>Редактировать профиль</h4>
+    <form id="avatar-form" enctype="multipart/form-data">
+        <label for="avatar">Загрузить аватар:</label>
+        <input type="file" id="avatar" name="avatar">
+        <button type="submit">Сохранить аватар</button>
+    </form>
+    <form id="bio-form">
+        <label for="bio">Биография:</label>
+        <textarea id="bio" name="bio"></textarea>
+        <button type="submit">Сохранить биографию</button>
+    </form>
+    {% endif %}
+</div>
+
+<div id="reading-list">
+    <h3>Список чтения</h3>
+
+    <h4>Читаю сейчас:</h4>
+    <ul id="currently-reading-list">
+        <li>Загрузка...</li>
+    </ul>
+
+    <h4>Завершенные книги:</h4>
+    <ul id="completed-list">
+        <li>Загрузка...</li>
+    </ul>
+
+    <h4>Книги, которые планирую прочитать:</h4>
+    <ul id="to-read-list">
+        <li>Загрузка...</li>
+    </ul>
+</div>
+
+<div>
+    <a href="{% url 'users:logout' %}">Выйти</a>
+    <a href="{% url 'index' %}">На главную</a>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const username = "{{ profile_user.username }}";  // Имя пользователя, переданное из Django
+
+        // Логируем и загружаем информацию о пользователе
+        console.log("Загрузка информации о пользователе...");
+        fetch(`/api/profile/${username}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Получены данные профиля:", data);
+                document.getElementById('user-email').innerText = data.email;
+                document.getElementById('user-bio').innerText = data.bio || "Нет информации";
+
+                if (data.avatar) {
+                    const avatarImage = document.getElementById('avatar-image');
+                    avatarImage.src = data.avatar;
+                    avatarImage.style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке информации о пользователе:', error));
+
+        // Загрузка списка чтения
+        console.log("Загрузка списка чтения...");
+        fetch(`/api/reading_list/${username}/`)
+            .then(response => response.json())
+            .then(data => {
+                const currentlyReadingList = document.getElementById('currently-reading-list');
+                const completedList = document.getElementById('completed-list');
+                const toReadList = document.getElementById('to-read-list');
+
+                currentlyReadingList.innerHTML = '';
+                completedList.innerHTML = '';
+                toReadList.innerHTML = '';
+
+                console.log("Полученные данные списка чтения:", data);  // Логируем ответ API
+
+                if (data.length === 0) {
+                    currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
+                    completedList.innerHTML = '<li>Нет завершенных книг.</li>';
+                    toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
+                } else {
+                    // Создаем массив запросов для получения информации о каждой книге по ID
+                    const bookRequests = data.map(item => {
+                        console.log("ID книги:", item.book);  // Логируем ID каждой книги
+                        return fetch(`/api/book/${item.book}/`);  // Изменено на item.book
+                    });
+
+                    // Ждем, пока все запросы завершатся
+                    Promise.all(bookRequests)
+                        .then(responses => Promise.all(responses.map(res => res.json())))
+                        .then(books => {
+                            books.forEach((book, index) => {
+                                const item = data[index];
+                                const li = document.createElement('li');
+                                li.innerHTML = `<a href="/book/${book.id}/">${book.title}</a>`; // Добавляем ссылку на книгу
+                                if (item.read_date) {
+                                    li.innerHTML += ` - Прочитано: ${item.read_date}`;
+                                }
+
+                                // Добавляем кнопку удаления книги, если текущий пользователь является владельцем профиля
+                                if ("{{ is_owner }}" === "True") {
+                                    const deleteButton = document.createElement('button');
+                                    deleteButton.innerText = 'Удалить';
+                                    deleteButton.onclick = function() {
+                                        deleteBook(item.id); // Вызов функции удаления
+                                    };
+                                    li.appendChild(deleteButton);
+                                }
+
+                                // Добавляем книгу в соответствующий список в зависимости от статуса
+                                if (item.status === 'currently_reading') {
+                                    currentlyReadingList.appendChild(li);
+                                } else if (item.status === 'completed') {
+                                    completedList.appendChild(li);
+                                } else if (item.status === 'planned') {
+                                    toReadList.appendChild(li);
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
+    });
+
+    // Функция удаления книги
+    function deleteBook(readingListId) {
+        console.log(`Удаление записи с ID: ${readingListId}...`);
+        fetch(`/api/reading_list/{{ profile_user.username }}/${readingListId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',  // Добавляем CSRF-токен
+                'Content-Type': 'application/json'  // Устанавливаем заголовок
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Запись успешно удалена!");
+                location.reload(); // Перезагрузка страницы для обновления списка
+            } else {
+                console.error("Ошибка при удалении записи.");
+            }
+        })
+        .catch(error => console.error('Ошибка при отправке запроса на удаление записи:', error));
+    }
+
+    // Обработчик для загрузки аватара
+    document.getElementById('avatar-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log("Сохранение аватара...");
+
+        const formData = new FormData();
+        const avatarInput = document.getElementById('avatar').files[0];
+        if (avatarInput) {
+            formData.append('avatar', avatarInput);
+        } else {
+            console.log("Файл аватара не выбран.");
+            return;
+        }
+
+        fetch(`/api/profile/{{ profile_user.username }}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Аватар успешно обновлён!");
+                location.reload();
+            } else {
+                console.error("Ошибка при обновлении аватара.");
+            }
+        })
+        .catch(error => console.error('Ошибка при отправке запроса на обновление аватара:', error));
+    });
+
+    // Обработчик для изменения биографии
+    document.getElementById('bio-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log("Сохранение биографии...");
+
+        const bio = document.getElementById('bio').value;
+        if (!bio) {
+            console.log("Биография не введена.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('bio', bio);
+
+        fetch(`/api/profile/{{ profile_user.username }}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Биография успешно обновлена!");
+                location.reload();
+            } else {
+                console.error("Ошибка при обновлении биографии.");
+            }
+        })
+        .catch(error => console.error('Ошибка при отправке запроса на обновление биографии:', error));
+    });
+</script>
+
+{% endblock %}

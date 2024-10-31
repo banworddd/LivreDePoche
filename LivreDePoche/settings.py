@@ -22,6 +22,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users',
     'books',
+    'api',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -124,6 +126,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Путь к папке, где будут храниться медиафайлы
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Убедитесь, что здесь указан правильный путь к вашей папке с медиафайлами
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+API_BASE_URL = 'http://localhost:8000/api'  # Убедитесь, что это правильный URL вашего API
