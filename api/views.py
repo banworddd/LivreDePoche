@@ -11,8 +11,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .permissions import IsAuthenticatedOrReadOnly
-from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer
-from users.models import CustomUser, ReadingList
+from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer
+from users.models import CustomUser, ReadingList, BookReview
 from books.models import Book
 
 
@@ -146,6 +146,94 @@ class BookView(APIView):
         serializer = BookSerializer(book)
         return Response(serializer.data)
 
+class BookReviewView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, book_id):
+        """Получение списка отзывов на книгу."""
+        book = get_object_or_404(Book, id=book_id)
+        reviews = BookReview.objects.filter(book=book)
+        serializer = BookReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, book_id):
+        """Добавление нового отзыва."""
+        book = get_object_or_404(Book, id=book_id)
+        serializer = BookReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, book=book)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, book_id, review_id):
+        """Редактирование отзыва пользователя на книгу."""
+        review = get_object_or_404(BookReview, id=review_id, book_id=book_id, user=request.user)
+        serializer = BookReviewSerializer(review, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, book_id, review_id):
+        """Удаление отзыва пользователя на книгу."""
+        review = get_object_or_404(BookReview, id=review_id, book_id=book_id, user=request.user)
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserReviewsView(APIView):
+    """
+    API для работы с отзывами на книги, написанными конкретным пользователем.
+    """
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, username):
+        """Получение списка отзывов, написанных пользователем."""
+        user = get_object_or_404(CustomUser, username=username)
+        reviews = BookReview.objects.filter(user=user)
+        serializer = BookReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, username):
+        """Добавление нового отзыва текущим пользователем."""
+        # Убедимся, что пользователь пишет от своего имени
+        if request.user.username != username:
+            return Response(
+                {"detail": "Вы не можете добавлять отзывы от имени другого пользователя."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        serializer = BookReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, username, review_id):
+        """Редактирование отзыва текущего пользователя."""
+        # Убедимся, что пользователь редактирует свой отзыв
+        if request.user.username != username:
+            return Response(
+                {"detail": "Вы не можете редактировать отзывы другого пользователя."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        review = get_object_or_404(BookReview, id=review_id, user=request.user)
+        serializer = BookReviewSerializer(review, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, username, review_id):
+        """Удаление отзыва текущего пользователя."""
+        # Убедимся, что пользователь удаляет свой отзыв
+        if request.user.username != username:
+            return Response(
+                {"detail": "Вы не можете удалять отзывы другого пользователя."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        review = get_object_or_404(BookReview, id=review_id, user=request.user)
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 def send_welcome_email(user):
     subject = 'Добро пожаловать в наш сервис!'

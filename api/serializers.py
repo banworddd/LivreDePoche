@@ -109,3 +109,11 @@ class ReadingListSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+class BookReviewSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)  # Возвращает имя пользователя
+
+    class Meta:
+        model = BookReview
+        fields = ['id', 'user', 'rating', 'review_text', 'review_date']
+        read_only_fields = ['id', 'user', 'review_date']

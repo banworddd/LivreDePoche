@@ -48,6 +48,13 @@
     </ul>
 </div>
 
+<div id="reviews">
+    <h3>Отзывы</h3>
+    <ul id="reviews-list">
+        <li>Загрузка...</li>
+    </ul>
+</div>
+
 <div>
     <a href="{% url 'users:logout' %}">Выйти</a>
     <a href="{% url 'index' %}">На главную</a>
@@ -87,32 +94,29 @@
                 completedList.innerHTML = '';
                 toReadList.innerHTML = '';
 
-                console.log("Полученные данные списка чтения:", data);  // Логируем ответ API
+                console.log("Полученные данные списка чтения:", data);
 
                 if (data.length === 0) {
                     currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
                     completedList.innerHTML = '<li>Нет завершенных книг.</li>';
                     toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
                 } else {
-                    // Создаем массив запросов для получения информации о каждой книге по ID
                     const bookRequests = data.map(item => {
-                        console.log("ID книги:", item.book);  // Логируем ID каждой книги
-                        return fetch(`/api/book/${item.book}/`);  // Изменено на item.book
+                        console.log("ID книги:", item.book);
+                        return fetch(`/api/book/${item.book}/`);
                     });
 
-                    // Ждем, пока все запросы завершатся
                     Promise.all(bookRequests)
                         .then(responses => Promise.all(responses.map(res => res.json())))
                         .then(books => {
                             books.forEach((book, index) => {
                                 const item = data[index];
                                 const li = document.createElement('li');
-                                li.innerHTML = `<a href="/book/${book.id}/">${book.title}</a>`; // Добавляем ссылку на книгу
+                                li.innerHTML = `<a href="/book/${book.id}/">${book.title}</a>`;
                                 if (item.read_date) {
                                     li.innerHTML += ` - Прочитано: ${item.read_date}`;
                                 }
 
-                                // Добавляем кнопку удаления книги, если текущий пользователь является владельцем профиля
                                 if ("{{ is_owner }}" === "True") {
                                     const deleteButton = document.createElement('button');
                                     deleteButton.innerText = 'Удалить';
@@ -122,7 +126,6 @@
                                     li.appendChild(deleteButton);
                                 }
 
-                                // Добавляем книгу в соответствующий список в зависимости от статуса
                                 if (item.status === 'currently_reading') {
                                     currentlyReadingList.appendChild(li);
                                 } else if (item.status === 'completed') {
@@ -136,6 +139,26 @@
                 }
             })
             .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
+
+        // Загрузка отзывов пользователя
+        console.log("Загрузка отзывов...");
+        fetch(`/api/user_reviews/${username}/`)  // Исправленный путь
+            .then(response => response.json())
+            .then(data => {
+                const reviewsList = document.getElementById('reviews-list');
+                reviewsList.innerHTML = '';  // Очистка текущего списка отзывов
+
+                if (data.length === 0) {
+                    reviewsList.innerHTML = '<li>Нет отзывов.</li>';
+                } else {
+                    data.forEach(review => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>${review.book.title}</strong>: ${review.text}`;
+                        reviewsList.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке отзывов:', error));
     });
 
     // Функция удаления книги
@@ -144,14 +167,14 @@
         fetch(`/api/reading_list/{{ profile_user.username }}/${readingListId}/`, {
             method: 'DELETE',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}',  // Добавляем CSRF-токен
-                'Content-Type': 'application/json'  // Устанавливаем заголовок
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
             }
         })
         .then(response => {
             if (response.ok) {
                 console.log("Запись успешно удалена!");
-                location.reload(); // Перезагрузка страницы для обновления списка
+                location.reload();
             } else {
                 console.error("Ошибка при удалении записи.");
             }
@@ -177,7 +200,7 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+                'X-CSRFToken': '{{ csrf_token }}'
             }
         })
         .then(response => {
@@ -209,7 +232,7 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+                'X-CSRFToken': '{{ csrf_token }}'
             }
         })
         .then(response => {
