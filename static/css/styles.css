@@ -1,0 +1,218 @@
+/* Основные стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Контейнер */
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 0;
+}
+
+/* Хедер */
+.site-header {
+    background-color: #bababa;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0;
+}
+
+/* Сайт title */
+.site-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.site-title-link {
+    text-decoration: none;
+    color: white;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.site-title-link:hover {
+    display: inline-block;
+    text-decoration: none;
+    transform: scale(1.1)
+}
+
+/* Навигация */
+.main-nav {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.nav-list {
+    list-style: none;
+    display: inline-flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #888888; /* Темнее, чтобы отличаться */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    display: inline-block;
+}
+
+.nav-link:hover {
+    background-color: #878787; /* Выделяем цвет */
+    transform: scale(1.1); /* Увеличение кнопки */
+}
+
+/* Иконка пользователя и выпадающее меню */
+.user-menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-icon {
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Выпадающее меню */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: -60px;
+    background-color: #b9b9b9;
+    border-radius: 5px;
+    list-style: none;
+    padding: 10px 0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.user-menu.active .dropdown-menu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown-menu li {
+    padding: 5px 20px;
+}
+
+.dropdown-menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: normal;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-menu a:hover {
+    background-color: #878787;
+    transform: scale(1.1); /* Увеличение на 10% при наведении */
+}
+
+/* Подвал */
+.site-footer {
+    background-color: #b9b9b9;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.footer-link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: none;
+}
+
+.profile-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Левая колонка */
+.user-info {
+    flex: 1;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-info .user-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.edit-forms {
+    margin-top: 20px;
+}
+
+.edit-forms form {
+    margin-bottom: 15px;
+}
+
+/* Правая колонка */
+.user-details {
+    flex: 2;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-details h3, .user-details h4 {
+    margin-bottom: 10px;
+}
+
+.user-details ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.user-details ul li {
+    margin-bottom: 10px;
+}
+
+/* Кнопки */
+.actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.actions .button {
+    text-decoration: none;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin: 0 5px;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.actions .button:hover {
+    background-color: #0056b3;
+}

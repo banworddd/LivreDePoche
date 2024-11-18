@@ -3,61 +3,68 @@
 {% block title %}Профиль пользователя: {{ profile_user.username }}{% endblock %}
 
 {% block content %}
-<h2>{{ profile_user.username }}'s Профиль</h2>
+<h2>Профиль пользователя: {{ profile_user.username }}</h2>
 
-<div id="user-info">
-    <h3>Информация о пользователе</h3>
-    <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
-    <p><strong>Биография:</strong> <span id="user-bio">Загрузка...</span></p>
+<div class="profile-container">
+    <!-- Левая колонка: информация о пользователе -->
+    <aside class="user-info">
+        <h3>Информация о пользователе</h3>
+        <div class="user-avatar">
+            <img src="" alt="Аватар" id="avatar-image" style="display: none;">
+        </div>
+        <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
+        <p><strong>Биография:</strong> <span id="user-bio">Загрузка...</span></p>
 
-    <div id="user-avatar">
-        <img src="" alt="Avatar" style="width: 100px; height: 100px; display: none;" id="avatar-image">
-    </div>
+        {% if is_owner %}
+        <div class="edit-forms">
+            <h4>Редактировать профиль</h4>
+            <form id="avatar-form" enctype="multipart/form-data">
+                <label for="avatar">Загрузить аватар:</label>
+                <input type="file" id="avatar" name="avatar">
+                <button type="submit">Сохранить</button>
+            </form>
 
-    {% if is_owner %}
-    <h4>Редактировать профиль</h4>
-    <form id="avatar-form" enctype="multipart/form-data">
-        <label for="avatar">Загрузить аватар:</label>
-        <input type="file" id="avatar" name="avatar">
-        <button type="submit">Сохранить аватар</button>
-    </form>
-    <form id="bio-form">
-        <label for="bio">Биография:</label>
-        <textarea id="bio" name="bio"></textarea>
-        <button type="submit">Сохранить биографию</button>
-    </form>
-    {% endif %}
+            <form id="bio-form">
+                <label for="bio">Обновить биографию:</label>
+                <textarea id="bio" name="bio"></textarea>
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+        {% endif %}
+    </aside>
+
+    <!-- Правая колонка: списки и отзывы -->
+    <main class="user-details">
+        <div id="reading-list">
+            <h3>Список чтения</h3>
+            <h4>Читаю сейчас:</h4>
+            <ul id="currently-reading-list">
+                <li>Загрузка...</li>
+            </ul>
+
+            <h4>Завершенные книги:</h4>
+            <ul id="completed-list">
+                <li>Загрузка...</li>
+            </ul>
+
+            <h4>Книги, которые планирую прочитать:</h4>
+            <ul id="to-read-list">
+                <li>Загрузка...</li>
+            </ul>
+        </div>
+
+        <div id="reviews">
+            <h3>Отзывы</h3>
+            <ul id="reviews-list">
+                <li>Загрузка...</li>
+            </ul>
+        </div>
+    </main>
 </div>
 
-<div id="reading-list">
-    <h3>Список чтения</h3>
-
-    <h4>Читаю сейчас:</h4>
-    <ul id="currently-reading-list">
-        <li>Загрузка...</li>
-    </ul>
-
-    <h4>Завершенные книги:</h4>
-    <ul id="completed-list">
-        <li>Загрузка...</li>
-    </ul>
-
-    <h4>Книги, которые планирую прочитать:</h4>
-    <ul id="to-read-list">
-        <li>Загрузка...</li>
-    </ul>
-</div>
-
-<div id="reviews">
-    <h3>Отзывы</h3>
-    <ul id="reviews-list">
-        <li>Загрузка...</li>
-    </ul>
-</div>
-
-<div>
-    <a href="{% url 'users:logout' %}">Выйти</a>
-    <a href="{% url 'index' %}">На главную</a>
+<div class="actions">
+    <a href="{% url 'users:logout' %}" class="button">Выйти</a>
+    <a href="{% url 'index' %}" class="button">На главную</a>
 </div>
 
 <script>
