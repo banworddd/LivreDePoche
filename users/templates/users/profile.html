@@ -142,18 +142,22 @@
 
         // Загрузка отзывов пользователя
         console.log("Загрузка отзывов...");
-        fetch(`/api/user_reviews/${username}/`)  // Исправленный путь
+        fetch(`/api/user_reviews/${username}/`)
             .then(response => response.json())
             .then(data => {
                 const reviewsList = document.getElementById('reviews-list');
-                reviewsList.innerHTML = '';  // Очистка текущего списка отзывов
+                reviewsList.innerHTML = ''; // Очищаем список
 
                 if (data.length === 0) {
                     reviewsList.innerHTML = '<li>Нет отзывов.</li>';
                 } else {
                     data.forEach(review => {
                         const li = document.createElement('li');
-                        li.innerHTML = `<strong>${review.book.title}</strong>: ${review.text}`;
+                        li.innerHTML = `
+                            <strong><a href="/book/${review.book_id}/">${review.book_title}</a></strong> - Рейтинг: ${review.rating}<br>
+                            <em>Отзыв: ${review.review_text}</em><br>
+                            <small>Дата отзыва: ${review.review_date}</small>
+                        `;
                         reviewsList.appendChild(li);
                     });
                 }
@@ -181,6 +185,38 @@
         })
         .catch(error => console.error('Ошибка при отправке запроса на удаление записи:', error));
     }
+
+    // Вернувшаяся версия обработчика для изменения биографии
+    document.getElementById('bio-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        console.log("Сохранение биографии...");
+
+        const bio = document.getElementById('bio').value;
+        if (!bio) {
+            console.log("Биография не введена.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('bio', bio); // Добавляем биографию в formData
+
+        fetch(`/api/profile/{{ profile_user.username }}/`, {
+            method: 'POST',
+            body: formData,  // Отправляем через FormData
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // CSRF токен для безопасности
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Биография успешно обновлена!");
+                location.reload();
+            } else {
+                console.error("Ошибка при обновлении биографии.");
+            }
+        })
+        .catch(error => console.error('Ошибка при отправке запроса на обновление биографии:', error));
+    });
 
     // Обработчик для загрузки аватара
     document.getElementById('avatar-form').addEventListener('submit', function(event) {
@@ -212,38 +248,6 @@
             }
         })
         .catch(error => console.error('Ошибка при отправке запроса на обновление аватара:', error));
-    });
-
-    // Обработчик для изменения биографии
-    document.getElementById('bio-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log("Сохранение биографии...");
-
-        const bio = document.getElementById('bio').value;
-        if (!bio) {
-            console.log("Биография не введена.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('bio', bio);
-
-        fetch(`/api/profile/{{ profile_user.username }}/`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Биография успешно обновлена!");
-                location.reload();
-            } else {
-                console.error("Ошибка при обновлении биографии.");
-            }
-        })
-        .catch(error => console.error('Ошибка при отправке запроса на обновление биографии:', error));
     });
 </script>
 

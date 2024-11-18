@@ -15,9 +15,21 @@ def books_view(request):
 
 
 def book_detail_view(request, book_id):
-    # Получаем книгу по id или возвращаем 404
-    book = get_object_or_404(Book, id=book_id)
-    return render(request, 'books/book_detail.html', {'book': book})
+    book = Book.objects.get(id=book_id)
+
+    # Получаем список отзывов для книги
+    reviews = BookReview.objects.filter(book=book)
+
+    # Проверяем, оставил ли текущий пользователь отзыв
+    user_reviewed = reviews.filter(user=request.user).exists()
+
+    # Передаем переменные в шаблон
+    context = {
+        'book': book,
+        'reviews': reviews,
+        'user_reviewed': user_reviewed,
+    }
+    return render(request, 'books/book_detail.html', context)
 
 
 @login_required

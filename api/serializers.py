@@ -117,3 +117,10 @@ class BookReviewSerializer(serializers.ModelSerializer):
         model = BookReview
         fields = ['id', 'user', 'rating', 'review_text', 'review_date']
         read_only_fields = ['id', 'user', 'review_date']
+
+class UserReviewSerializer(serializers.ModelSerializer):
+    book_title = serializers.CharField(source='book.title')  # Добавляем название книги в сериализатор
+
+    class Meta:
+        model = BookReview
+        fields = ['id', 'user', 'book_title', 'rating', 'review_text', 'review_date','book_id']  # Поля, которые должны быть включены в сериализатор

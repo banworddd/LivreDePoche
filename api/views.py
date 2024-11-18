@@ -11,7 +11,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .permissions import IsAuthenticatedOrReadOnly
-from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer
+from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer, UserReviewSerializer
 from users.models import CustomUser, ReadingList, BookReview
 from books.models import Book
 
@@ -181,59 +181,17 @@ class BookReviewView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserReviewsView(APIView):
-    """
-    API для работы с отзывами на книги, написанными конкретным пользователем.
-    """
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
+class UserBookReviewsView(APIView):
     def get(self, request, username):
-        """Получение списка отзывов, написанных пользователем."""
-        user = get_object_or_404(CustomUser, username=username)
-        reviews = BookReview.objects.filter(user=user)
-        serializer = BookReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+        # Получаем все отзывы пользователя по его имени
+        reviews = BookReview.objects.filter(user__username=username)
 
-    def post(self, request, username):
-        """Добавление нового отзыва текущим пользователем."""
-        # Убедимся, что пользователь пишет от своего имени
-        if request.user.username != username:
-            return Response(
-                {"detail": "Вы не можете добавлять отзывы от имени другого пользователя."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        serializer = BookReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, username, review_id):
-        """Редактирование отзыва текущего пользователя."""
-        # Убедимся, что пользователь редактирует свой отзыв
-        if request.user.username != username:
-            return Response(
-                {"detail": "Вы не можете редактировать отзывы другого пользователя."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        review = get_object_or_404(BookReview, id=review_id, user=request.user)
-        serializer = BookReviewSerializer(review, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, username, review_id):
-        """Удаление отзыва текущего пользователя."""
-        # Убедимся, что пользователь удаляет свой отзыв
-        if request.user.username != username:
-            return Response(
-                {"detail": "Вы не можете удалять отзывы другого пользователя."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        review = get_object_or_404(BookReview, id=review_id, user=request.user)
-        review.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        # Если отзывы найдены, сериализуем их
+        if reviews.exists():
+            serializer = UserReviewSerializer(reviews, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Отзывы не найдены."}, status=status.HTTP_404_NOT_FOUND)
 
 def send_welcome_email(user):
     subject = 'Добро пожаловать в наш сервис!'
