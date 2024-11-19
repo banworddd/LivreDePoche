@@ -1,261 +1,90 @@
 {% extends 'layout.html' %}
+{% load static %}
 
-{% block title %}Профиль пользователя: {{ profile_user.username }}{% endblock %}
+{% block title %}Профиль: {{ profile_user.username }}{% endblock %}
 
 {% block content %}
-<h2>Профиль пользователя: {{ profile_user.username }}</h2>
+<div class="profile-container" data-username="{{ profile_user.username }}" data-csrf="{{ csrf_token }}">
+    <!-- Верхний блок: информация о пользователе -->
+    <section class="user-info text-center mb-4" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 15px; background-color: #ffffff;">
+        <div class="position-relative d-inline-block avatar-container">
+            <img src="{{ profile_user.avatar.url }}" alt="Аватар" id="avatar-image" class="rounded-circle mb-2"
+                 style="width: 150px; height: 150px; object-fit: cover; display: block; border-radius: 50%;">
 
-<div class="profile-container">
-    <!-- Левая колонка: информация о пользователе -->
-    <aside class="user-info">
-        <h3>Информация о пользователе</h3>
-        <div class="user-avatar">
-            <img src="" alt="Аватар" id="avatar-image" style="display: none;">
+            {% if is_owner %}
+            <div class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle"
+                 style="display: none; cursor: pointer; background-color: rgba(0, 0, 0, 0.5); width: 150px; height: 150px; position: absolute; top: 0; left: 0; border-radius: 50%;">
+                <i class="bi bi-pencil text-white" style="font-size: 2rem;"></i>
+            </div>
+            <input type="file" id="avatar" style="display: none;">
+            {% endif %}
         </div>
-        <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
-        <p><strong>Биография:</strong> <span id="user-bio">Загрузка...</span></p>
-
+        <h3 class="mt-2">{{ profile_user.username }}</h3>
         {% if is_owner %}
-        <div class="edit-forms">
-            <h4>Редактировать профиль</h4>
-            <form id="avatar-form" enctype="multipart/form-data">
-                <label for="avatar">Загрузить аватар:</label>
-                <input type="file" id="avatar" name="avatar">
-                <button type="submit">Сохранить</button>
-            </form>
-
-            <form id="bio-form">
-                <label for="bio">Обновить биографию:</label>
-                <textarea id="bio" name="bio"></textarea>
-                <button type="submit">Сохранить</button>
-            </form>
-        </div>
+        <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
         {% endif %}
-    </aside>
-
-    <!-- Правая колонка: списки и отзывы -->
-    <main class="user-details">
-        <div id="reading-list">
-            <h3>Список чтения</h3>
-            <h4>Читаю сейчас:</h4>
-            <ul id="currently-reading-list">
-                <li>Загрузка...</li>
-            </ul>
-
-            <h4>Завершенные книги:</h4>
-            <ul id="completed-list">
-                <li>Загрузка...</li>
-            </ul>
-
-            <h4>Книги, которые планирую прочитать:</h4>
-            <ul id="to-read-list">
-                <li>Загрузка...</li>
-            </ul>
+        <div class="user-bio">
+            <p>
+                <strong>Биография:</strong>
+                <span id="user-bio" class="d-inline-block">{{ profile_user.bio }}</span>
+                {% if is_owner %}
+                <button id="edit-bio" class="btn p-0 border-0" style="background: none;">
+                    <i class="bi bi-pencil text-muted" style="font-size: 1.2rem;"></i>
+                </button>
+                <div id="bio-form" style="display: none;" class="input-group mt-2">
+                    <textarea id="bio" name="bio" class="form-control form-control-sm border-0"
+                              style="resize: none; background-color: #f8f9fa; font-size: 1rem;"></textarea>
+                </div>
+                {% endif %}
+            </p>
         </div>
+    </section>
 
-        <div id="reviews">
-            <h3>Отзывы</h3>
-            <ul id="reviews-list">
-                <li>Загрузка...</li>
-            </ul>
-        </div>
-    </main>
+    <div class="lower-blocks row mt-4">
+        <!-- Блок с отзывами -->
+        <section id="reviews" class="col-md-4 mb-3">
+            <div class="card shadow-sm" style="border-radius: 15px; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="card-header text-center" style="background-color: #f8f9fa; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h5 class="mb-0">Отзывы</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Отзывы по книгам:</h6>
+                    <ul id="reviews-list" class="list-group" style="list-style: none; padding: 0;">
+                        <li class="review-item list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                            Загрузка...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Блок со списками -->
+        <section id="reading-list" class="col-md-4 mb-3">
+            <div class="card shadow-sm" style="border-radius: 15px; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="card-header text-center" style="background-color: #f8f9fa; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h5 class="mb-0">Список чтения</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Читаю сейчас:</h6>
+                    <ul id="currently-reading-list" class="list-group mb-3" style="list-style: none; padding: 0;">
+                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
+                    </ul>
+
+                    <h6>Завершенные книги:</h6>
+                    <ul id="completed-list" class="list-group mb-3" style="list-style: none; padding: 0;">
+                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
+                    </ul>
+
+                    <h6>Книги, которые планирую прочитать:</h6>
+                    <ul id="to-read-list" class="list-group" style="list-style: none; padding: 0;">
+                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
-<div class="actions">
-    <a href="{% url 'users:logout' %}" class="button">Выйти</a>
-    <a href="{% url 'index' %}" class="button">На главную</a>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const username = "{{ profile_user.username }}";  // Имя пользователя, переданное из Django
-
-        // Логируем и загружаем информацию о пользователе
-        console.log("Загрузка информации о пользователе...");
-        fetch(`/api/profile/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                console.log("Получены данные профиля:", data);
-                document.getElementById('user-email').innerText = data.email;
-                document.getElementById('user-bio').innerText = data.bio || "Нет информации";
-
-                if (data.avatar) {
-                    const avatarImage = document.getElementById('avatar-image');
-                    avatarImage.src = data.avatar;
-                    avatarImage.style.display = 'block';
-                }
-            })
-            .catch(error => console.error('Ошибка при загрузке информации о пользователе:', error));
-
-        // Загрузка списка чтения
-        console.log("Загрузка списка чтения...");
-        fetch(`/api/reading_list/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                const currentlyReadingList = document.getElementById('currently-reading-list');
-                const completedList = document.getElementById('completed-list');
-                const toReadList = document.getElementById('to-read-list');
-
-                currentlyReadingList.innerHTML = '';
-                completedList.innerHTML = '';
-                toReadList.innerHTML = '';
-
-                console.log("Полученные данные списка чтения:", data);
-
-                if (data.length === 0) {
-                    currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
-                    completedList.innerHTML = '<li>Нет завершенных книг.</li>';
-                    toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
-                } else {
-                    const bookRequests = data.map(item => {
-                        console.log("ID книги:", item.book);
-                        return fetch(`/api/book/${item.book}/`);
-                    });
-
-                    Promise.all(bookRequests)
-                        .then(responses => Promise.all(responses.map(res => res.json())))
-                        .then(books => {
-                            books.forEach((book, index) => {
-                                const item = data[index];
-                                const li = document.createElement('li');
-                                li.innerHTML = `<a href="/book/${book.id}/">${book.title}</a>`;
-                                if (item.read_date) {
-                                    li.innerHTML += ` - Прочитано: ${item.read_date}`;
-                                }
-
-                                if ("{{ is_owner }}" === "True") {
-                                    const deleteButton = document.createElement('button');
-                                    deleteButton.innerText = 'Удалить';
-                                    deleteButton.onclick = function() {
-                                        deleteBook(item.id); // Вызов функции удаления
-                                    };
-                                    li.appendChild(deleteButton);
-                                }
-
-                                if (item.status === 'currently_reading') {
-                                    currentlyReadingList.appendChild(li);
-                                } else if (item.status === 'completed') {
-                                    completedList.appendChild(li);
-                                } else if (item.status === 'planned') {
-                                    toReadList.appendChild(li);
-                                }
-                            });
-                        })
-                        .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
-                }
-            })
-            .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
-
-        // Загрузка отзывов пользователя
-        console.log("Загрузка отзывов...");
-        fetch(`/api/user_reviews/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                const reviewsList = document.getElementById('reviews-list');
-                reviewsList.innerHTML = ''; // Очищаем список
-
-                if (data.length === 0) {
-                    reviewsList.innerHTML = '<li>Нет отзывов.</li>';
-                } else {
-                    data.forEach(review => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <strong><a href="/book/${review.book_id}/">${review.book_title}</a></strong> - Рейтинг: ${review.rating}<br>
-                            <em>Отзыв: ${review.review_text}</em><br>
-                            <small>Дата отзыва: ${review.review_date}</small>
-                        `;
-                        reviewsList.appendChild(li);
-                    });
-                }
-            })
-            .catch(error => console.error('Ошибка при загрузке отзывов:', error));
-    });
-
-    // Функция удаления книги
-    function deleteBook(readingListId) {
-        console.log(`Удаление записи с ID: ${readingListId}...`);
-        fetch(`/api/reading_list/{{ profile_user.username }}/${readingListId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Запись успешно удалена!");
-                location.reload();
-            } else {
-                console.error("Ошибка при удалении записи.");
-            }
-        })
-        .catch(error => console.error('Ошибка при отправке запроса на удаление записи:', error));
-    }
-
-    // Вернувшаяся версия обработчика для изменения биографии
-    document.getElementById('bio-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log("Сохранение биографии...");
-
-        const bio = document.getElementById('bio').value;
-        if (!bio) {
-            console.log("Биография не введена.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('bio', bio); // Добавляем биографию в formData
-
-        fetch(`/api/profile/{{ profile_user.username }}/`, {
-            method: 'POST',
-            body: formData,  // Отправляем через FormData
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'  // CSRF токен для безопасности
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Биография успешно обновлена!");
-                location.reload();
-            } else {
-                console.error("Ошибка при обновлении биографии.");
-            }
-        })
-        .catch(error => console.error('Ошибка при отправке запроса на обновление биографии:', error));
-    });
-
-    // Обработчик для загрузки аватара
-    document.getElementById('avatar-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        console.log("Сохранение аватара...");
-
-        const formData = new FormData();
-        const avatarInput = document.getElementById('avatar').files[0];
-        if (avatarInput) {
-            formData.append('avatar', avatarInput);
-        } else {
-            console.log("Файл аватара не выбран.");
-            return;
-        }
-
-        fetch(`/api/profile/{{ profile_user.username }}/`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Аватар успешно обновлён!");
-                location.reload();
-            } else {
-                console.error("Ошибка при обновлении аватара.");
-            }
-        })
-        .catch(error => console.error('Ошибка при отправке запроса на обновление аватара:', error));
-    });
-</script>
+<script src="{% static 'js/profile.js' %}"></script>
 
 {% endblock %}

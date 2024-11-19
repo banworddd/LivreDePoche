@@ -6,6 +6,19 @@
     font-family: 'Arial', sans-serif;
 }
 
+/* Переменные для удобства изменения цветов */
+:root {
+    --main-bg-color: #bababa;
+    --link-hover-color: #878787;
+    --button-hover-color: #0056b3;
+    --secondary-bg-color: #f9f9f9;
+    --header-bg-color: #b9b9b9;
+    --footer-bg-color: #b9b9b9;
+    --border-color: #ccc;
+    --text-color: #555;
+    --input-focus-color: #007BFF;
+}
+
 /* Контейнер */
 .container {
     display: flex;
@@ -19,7 +32,7 @@
 
 /* Хедер */
 .site-header {
-    background-color: #bababa;
+    background-color: var(--main-bg-color);
     color: white;
     position: sticky;
     top: 0;
@@ -42,7 +55,7 @@
 .site-title-link:hover {
     display: inline-block;
     text-decoration: none;
-    transform: scale(1.1)
+    transform: scale(1.1);
 }
 
 /* Навигация */
@@ -64,14 +77,14 @@
     font-size: 18px;
     padding: 10px 15px;
     border-radius: 5px;
-    background-color: #888888; /* Темнее, чтобы отличаться */
+    background-color: #888888;
     transition: transform 0.3s ease, background-color 0.3s ease;
     display: inline-block;
 }
 
 .nav-link:hover {
-    background-color: #878787; /* Выделяем цвет */
-    transform: scale(1.1); /* Увеличение кнопки */
+    background-color: var(--link-hover-color);
+    transform: scale(1.1);
 }
 
 /* Иконка пользователя и выпадающее меню */
@@ -92,7 +105,7 @@
     position: absolute;
     top: 55px;
     right: -60px;
-    background-color: #b9b9b9;
+    background-color: var(--header-bg-color);
     border-radius: 5px;
     list-style: none;
     padding: 10px 0;
@@ -121,13 +134,13 @@
 }
 
 .dropdown-menu a:hover {
-    background-color: #878787;
-    transform: scale(1.1); /* Увеличение на 10% при наведении */
+    background-color: var(--link-hover-color);
+    transform: scale(1.1);
 }
 
 /* Подвал */
 .site-footer {
-    background-color: #b9b9b9;
+    background-color: var(--footer-bg-color);
     color: white;
     text-align: center;
     padding: 20px;
@@ -143,76 +156,193 @@
     text-decoration: none;
 }
 
+/* Основной контейнер профиля */
 .profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff; /* Убран серый фон для общего контейнера */
+}
+
+/* Верхний блок с информацией пользователя */
+.user-info {
+    background-color: #e0e0e0; /* Темно-серый фон для блока с информацией */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Стили для блока с отзывами и списками */
+.lower-blocks {
     display: flex;
     justify-content: space-between;
     gap: 20px;
 }
 
-/* Левая колонка */
-.user-info {
+.block {
     flex: 1;
-    background-color: #f9f9f9;
-    padding: 15px;
+    background-color: #e0e0e0; /* Темно-серый фон для блоков */
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.user-info .user-avatar img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+/* Стили для каждого элемента в списке (например, книги, отзывы) */
+.review-item, #currently-reading-list li, #completed-list li, #to-read-list li {
+    background-color: #e0e0e0; /* Темный серый для элементов списка */
+    padding: 15px; /* Внутренние отступы для каждого элемента */
     margin-bottom: 10px;
-}
-
-.edit-forms {
-    margin-top: 20px;
-}
-
-.edit-forms form {
-    margin-bottom: 15px;
-}
-
-/* Правая колонка */
-.user-details {
-    flex: 2;
-    background-color: #fff;
-    padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
 }
 
-.user-details h3, .user-details h4 {
-    margin-bottom: 10px;
+.review-item:hover, #currently-reading-list li:hover, #completed-list li:hover, #to-read-list li:hover {
+    background-color: #b0b0b0; /* Более темный оттенок при наведении */
 }
 
-.user-details ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0 0 20px 0;
+/* Стили для поля ввода */
+.styled-input {
+    width: 100%;
+    padding: 8px 10px;
+    margin: 5px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #e0e0e0; /* Цвет для фона поля ввода */
 }
 
-.user-details ul li {
-    margin-bottom: 10px;
+.styled-input:focus {
+    border-color: var(--input-focus-color);
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
 }
 
-/* Кнопки */
-.actions {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.actions .button {
+/* Стиль для кнопок */
+.styled-button {
     text-decoration: none;
-    background-color: #007BFF;
+    background-color: var(--input-focus-color);
     color: white;
     padding: 10px 15px;
     border-radius: 4px;
-    margin: 0 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
     display: inline-block;
     transition: background-color 0.3s;
 }
 
-.actions .button:hover {
-    background-color: #0056b3;
+.styled-button:hover {
+    background-color: var(--button-hover-color);
 }
+
+/* Стили для иконки карандаша (убран фокус) */
+#edit-bio {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#edit-bio i {
+    font-size: 1.2rem;
+    color: #6c757d;
+}
+
+#edit-bio:focus {
+    outline: none;
+}
+
+/* Аватарка: затемнение при наведении */
+.avatar-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* Затемнение */
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-container:hover .avatar-overlay {
+    display: flex; /* Показываем затемнение на аватарке */
+}
+
+/* Медиазапросы для адаптивности */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .lower-blocks {
+        flex-direction: column;
+    }
+
+    .block {
+        margin-bottom: 20px;
+    }
+
+    .profile-container {
+        padding: 15px;
+    }
+
+
+#reviews {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.review-item {
+    background-color: #e9ecef;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.review-item h6 a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.review-item h6 a:hover {
+    text-decoration: underline;
+}
+
+.rating {
+    color: gold;
+    font-size: 1.2rem;
+}
+
+.review-item p {
+    color: #000;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.review-item small {
+    color: #6c757d;
+    font-size: 0.875rem;
+}}
