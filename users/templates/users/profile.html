@@ -6,79 +6,85 @@
 {% block content %}
 <div class="profile-container" data-username="{{ profile_user.username }}" data-csrf="{{ csrf_token }}">
     <!-- Верхний блок: информация о пользователе -->
-    <section class="user-info text-center mb-4" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 15px; background-color: #ffffff;">
+    <section class="user-info text-center mb-4">
         <div class="position-relative d-inline-block avatar-container">
-            <img src="{{ profile_user.avatar.url }}" alt="Аватар" id="avatar-image" class="rounded-circle mb-2"
-                 style="width: 150px; height: 150px; object-fit: cover; display: block; border-radius: 50%;">
+            <img src="{{ profile_user.avatar.url }}" alt="Аватар" id="avatar-image" class="rounded-circle mb-2">
 
             {% if is_owner %}
-            <div class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle"
-                 style="display: none; cursor: pointer; background-color: rgba(0, 0, 0, 0.5); width: 150px; height: 150px; position: absolute; top: 0; left: 0; border-radius: 50%;">
-                <i class="bi bi-pencil text-white" style="font-size: 2rem;"></i>
+            <div class="avatar-overlay d-flex align-items-center justify-content-center rounded-circle">
+                <i class="bi bi-pencil text-white"></i>
             </div>
             <input type="file" id="avatar" style="display: none;">
             {% endif %}
         </div>
-        <h3 class="mt-2">{{ profile_user.username }}</h3>
+        <h3 class="mt-2"><strong>Никнейм:</strong>{{ profile_user.username }}</h3>
         {% if is_owner %}
         <p><strong>Email:</strong> <span id="user-email">Загрузка...</span></p>
         {% endif %}
         <div class="user-bio">
             <p>
-                <strong>Биография:</strong>
+                <strong>Статус:</strong>
                 <span id="user-bio" class="d-inline-block">{{ profile_user.bio }}</span>
+
                 {% if is_owner %}
-                <button id="edit-bio" class="btn p-0 border-0" style="background: none;">
-                    <i class="bi bi-pencil text-muted" style="font-size: 1.2rem;"></i>
+                <button id="edit-bio" class="btn p-0 border-0">
+                    <i class="bi bi-pencil text-muted"></i>
                 </button>
-                <div id="bio-form" style="display: none;" class="input-group mt-2">
-                    <textarea id="bio" name="bio" class="form-control form-control-sm border-0"
-                              style="resize: none; background-color: #f8f9fa; font-size: 1rem;"></textarea>
+
+                <!-- Форма редактирования -->
+                <div id="bio-form" class="input-group mt-2" style="display: none;">
+                    <textarea id="bio" name="bio" class="form-control form-control-sm border-0" rows="4">{{ profile_user.bio }}</textarea>
                 </div>
                 {% endif %}
             </p>
         </div>
     </section>
 
-    <div class="lower-blocks row mt-4">
+    <!-- Блок с отзывами и списками, расположенные горизонтально -->
+    <div class="lower-blocks d-flex justify-content-between mt-4">
         <!-- Блок с отзывами -->
-        <section id="reviews" class="col-md-4 mb-3">
-            <div class="card shadow-sm" style="border-radius: 15px; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                <div class="card-header text-center" style="background-color: #f8f9fa; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                    <h5 class="mb-0">Отзывы</h5>
-                </div>
-                <div class="card-body">
-                    <h6>Отзывы по книгам:</h6>
-                    <ul id="reviews-list" class="list-group" style="list-style: none; padding: 0;">
-                        <li class="review-item list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-                            Загрузка...
-                        </li>
-                    </ul>
-                </div>
+        <section id="reviews" class="card shadow-sm mb-3" style="flex: 1 1 30%;">
+            <div class="card-header text-center">
+                <h5 class="mb-0">Отзывы</h5>
+
+            </div>
+            <br>
+            <div class="card-body">
+                <ul id="reviews-list" class="list-group">
+                    <li class="review-item list-group-item">Загрузка...</li>
+                </ul>
             </div>
         </section>
 
-        <!-- Блок со списками -->
-        <section id="reading-list" class="col-md-4 mb-3">
-            <div class="card shadow-sm" style="border-radius: 15px; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                <div class="card-header text-center" style="background-color: #f8f9fa; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                    <h5 class="mb-0">Список чтения</h5>
-                </div>
-                <div class="card-body">
+        <!-- Блок со списками чтения -->
+        <section id="reading-list" class="card shadow-sm mb-3" style="flex: 1 1 65%;">
+            <div class="card-header text-center">
+                <h5 class="mb-0">Список чтения</h5>
+            </div>
+            <br>
+            <div class="card-body d-flex flex-wrap gap-3">
+                <!-- Блок "Читаю сейчас" -->
+                <div class="reading-list-block">
                     <h6>Читаю сейчас:</h6>
-                    <ul id="currently-reading-list" class="list-group mb-3" style="list-style: none; padding: 0;">
-                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
-                    </ul>
+                    <div id="currently-reading-list" class="reading-list">
+                        <div class="book-card">Загрузка...</div>
+                    </div>
+                </div>
 
+                <!-- Блок "Завершенные книги" -->
+                <div class="reading-list-block">
                     <h6>Завершенные книги:</h6>
-                    <ul id="completed-list" class="list-group mb-3" style="list-style: none; padding: 0;">
-                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
-                    </ul>
+                    <div id="completed-list" class="reading-list">
+                        <div class="book-card">Загрузка...</div>
+                    </div>
+                </div>
 
+                <!-- Блок "Книги, которые планирую прочитать" -->
+                <div class="reading-list-block">
                     <h6>Книги, которые планирую прочитать:</h6>
-                    <ul id="to-read-list" class="list-group" style="list-style: none; padding: 0;">
-                        <li class="list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f8f9fa; border-radius: 10px;">Загрузка...</li>
-                    </ul>
+                    <div id="to-read-list" class="reading-list">
+                        <div class="book-card">Загрузка...</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -86,5 +92,4 @@
 </div>
 
 <script src="{% static 'js/profile.js' %}"></script>
-
 {% endblock %}

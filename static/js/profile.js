@@ -116,74 +116,79 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Загрузка списка чтения
-    fetch(`/api/reading_list/${username}/`)
-        .then(response => response.json())
-        .then(data => {
-            const currentlyReadingList = document.getElementById('currently-reading-list');
-            const completedList = document.getElementById('completed-list');
-            const toReadList = document.getElementById('to-read-list');
+        // Загрузка списка чтения
+        fetch(`/api/reading_list/${username}/`)
+            .then(response => response.json())
+            .then(data => {
+                const currentlyReadingList = document.getElementById('currently-reading-list');
+                const completedList = document.getElementById('completed-list');
+                const toReadList = document.getElementById('to-read-list');
 
-            currentlyReadingList.innerHTML = '';
-            completedList.innerHTML = '';
-            toReadList.innerHTML = '';
+                currentlyReadingList.innerHTML = '';
+                completedList.innerHTML = '';
+                toReadList.innerHTML = '';
 
-            if (data.length === 0) {
-                currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
-                completedList.innerHTML = '<li>Нет завершенных книг.</li>';
-                toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
-            } else {
-                const bookRequests = data.map(item => {
-                    return fetch(`/api/book/${item.book}/`);
-                });
+                if (data.length === 0) {
+                    currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
+                    completedList.innerHTML = '<li>Нет завершенных книг.</li>';
+                    toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
+                } else {
+                    const bookRequests = data.map(item => {
+                        return fetch(`/api/book/${item.book}/`);
+                    });
 
-                Promise.all(bookRequests)
-                    .then(responses => Promise.all(responses.map(res => res.json())))
-                    .then(books => {
-                        books.forEach((book, index) => {
-                            const item = data[index];
-                            const li = document.createElement('li');
-                            li.innerHTML = `<a href="/book/${book.id}/">${book.title}</a>`;
-                            if (item.read_date) {
-                                li.innerHTML += ` - Прочитано: ${item.read_date}`;
-                            }
+                    Promise.all(bookRequests)
+                        .then(responses => Promise.all(responses.map(res => res.json())))
+                        .then(books => {
+                            books.forEach((book, index) => {
+                                const item = data[index];
+                                const li = document.createElement('li');
+                                li.classList.add('book-card');
+                                li.innerHTML = `
+                                    <a href="/book/${book.id}/">${book.title}</a>
+                                    ${item.read_date ? ` - Прочитано: ${item.read_date}` : ''}
+                                `;
 
-                            if ("{{ is_owner }}" === "True") {
-                                const deleteButton = document.createElement('button');
-                                deleteButton.innerText = 'Удалить';
-                                deleteButton.onclick = function() {
-                                    deleteBook(item.id); // Вызов функции удаления
-                                };
-                                li.appendChild(deleteButton);
-                            }
+                                // Если это владелец, показываем кнопку удаления
+                                if ("{{ is_owner }}" === "True") {
+                                    const deleteButton = document.createElement('button');
+                                    deleteButton.classList.add('delete-button');
+                                    deleteButton.innerHTML = '×';
+                                    deleteButton.onclick = function() {
+                                        deleteBook(item.id); // Вызов функции удаления
+                                    };
+                                    li.appendChild(deleteButton);
+                                }
 
-                            if (item.status === 'currently_reading') {
-                                currentlyReadingList.appendChild(li);
-                            } else if (item.status === 'completed') {
-                                completedList.appendChild(li);
-                            } else if (item.status === 'planned') {
-                                toReadList.appendChild(li);
-                            }
-                        });
-                    })
-                    .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
-            }
-        })
-        .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
+                                // Добавляем книгу в соответствующий список
+                                if (item.status === 'currently_reading') {
+                                    currentlyReadingList.appendChild(li);
+                                } else if (item.status === 'completed') {
+                                    completedList.appendChild(li);
+                                } else if (item.status === 'planned') {
+                                    toReadList.appendChild(li);
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
 
-    // Функция удаления книги
-    function deleteBook(readingListId) {
-        fetch(`/api/reading_list/${username}/${readingListId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(() => location.reload())
-        .catch(error => console.error('Ошибка при удалении книги:', error));
-    }
+        // Функция удаления книги
+        function deleteBook(readingListId) {
+            fetch(`/api/reading_list/${username}/${readingListId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(() => location.reload())
+            .catch(error => console.error('Ошибка при удалении книги:', error));
+        }
+
 
     // Загрузка отзывов
     const reviewsList = document.getElementById('reviews-list');
@@ -203,12 +208,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 data.forEach(review => {
                     const li = document.createElement('li');
                     li.classList.add('review-item', 'list-group-item');
-                    li.style.cssText = 'box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; border-radius: 10px; padding: 15px; margin-bottom: 15px;';
                     li.innerHTML = `
-                        <strong><a href="/book/${review.book_id}/">${review.book_title}</a></strong> - Рейтинг: ${review.rating}<br>
-                        <em>Отзыв: ${review.review_text}</em><br>
+                        <strong><a href="/book/${review.book_id}/">${review.book_title}</a></strong> <br>
+                        Рейтинг: ${getRatingStars(review.rating)}<br>
+                        <strong>Отзыв:</strong> ${review.review_text}<br>
                         <small>Дата отзыва: ${review.review_date}</small>
                     `;
+                    function getRatingStars(rating) {
+                        let stars = '';
+                        for (let i = 1; i <= 5; i++) {
+                            if (i <= rating) {
+                                stars += '★'; // Заполненная звезда
+                            } else {
+                                stars += '☆'; // Пустая звезда
+                            }
+                        }
+                        return stars;
+}
                     reviewsList.appendChild(li);
                 });
             }

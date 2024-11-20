@@ -58,23 +58,8 @@
             <p>&copy; 2024 <a href="https://t.me/banworddd10" class="footer-link">banworddd</a></p>
         </div>
     </footer>
-
-    <!-- JavaScript для управления выпадающим меню -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userMenu = document.querySelector('.user-menu');
-            if (userMenu) {
-                userMenu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    userMenu.classList.toggle('active');
-                });
-
-                // Закрытие меню при клике вне
-                document.addEventListener('click', () => {
-                    userMenu.classList.remove('active');
-                });
-            }
-        });
-    </script>
 </body>
+
+<script src="{% static 'js/layout.js' %}"></script>
+
 </html>
