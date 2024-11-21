@@ -17,6 +17,17 @@
     --border-color: #ccc;
     --input-focus-color: #007BFF;
 }
+body {
+    display: flex;
+    flex-direction: column; /* Располагаем элементы по вертикали */
+    min-height: 100vh; /* Минимальная высота страницы должна быть 100% от высоты экрана */
+    margin: 0; /* Убираем стандартные отступы */
+}
+
+main {
+    flex-grow: 1; /* Основной контент занимает оставшееся пространство */
+}
+
 
 /* Контейнер */
 .container {
@@ -29,7 +40,7 @@
     padding: 15px 0;
 }
 
-/* Хедер */
+/* Основные стили для хедера */
 .site-header {
     background-color: var(--main-bg-color);
     color: white;
@@ -37,14 +48,32 @@
     top: 0;
     z-index: 1000;
     padding: 0;
+    display: flex; /* Используем flexbox */
+    align-items: center; /* Выравнивание по вертикали */
+    padding-left: 10px; /* Уменьшаем отступ слева */
+    padding-right: 10px; /* Уменьшаем отступ справа */
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавлена тень */
+
 }
 
-/* Сайт title */
+.site-header.hidden {
+    transform: translateY(-100%); /* Скрываем хедер за верхний край */
+}
+
+/* Показываем хедер при наведении */
+.site-header.show-on-hover {
+    transform: translateY(0); /* Появление хедера */
+}
+
+/* Название сайта */
 .site-title {
     font-size: 24px;
     font-weight: bold;
+    margin-right: 20px; /* Добавляем отступ между названием и кнопками */
 }
 
+/* Ссылка на название сайта */
 .site-title-link {
     text-decoration: none;
     color: white;
@@ -57,16 +86,15 @@
     transform: scale(1.1);
 }
 
-/* Навигация */
+/* Основная навигация (книги и авторы) */
 .main-nav {
-    flex-grow: 1;
-    text-align: center;
+    display: flex;
+    gap: 20px;
 }
 
 .nav-list {
     list-style: none;
-    display: inline-flex;
-    justify-content: center;
+    display: flex;
     gap: 20px;
 }
 
@@ -84,6 +112,17 @@
 .nav-link:hover {
     background-color: var(--link-hover-color);
     transform: scale(1.1);
+}
+
+/* Правый блок с кнопками Войти / Регистрация */
+.auth-links {
+    display: flex;
+    gap: 20px; /* Равные отступы между кнопками */
+}
+
+/* Пустое пространство между навигацией и правой частью */
+.spacer {
+    flex-grow: 1;
 }
 
 /* Иконка пользователя и выпадающее меню */
@@ -141,9 +180,18 @@
 .site-footer {
     background-color: var(--footer-bg-color);
     color: white;
-    text-align: center;
-    padding: 20px;
-    margin-top: 20px;
+    text-align: center; /* Центрируем текст по горизонтали */
+    display: flex;
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    height: 50px; /* Задаем высоту футера */
+    margin-top: auto; /* Обеспечивает приклеивание футера к нижней части страницы */
+}
+
+.site-footer .container {
+    display: flex;
+    justify-content: center; /* Центрируем текст в контейнере */
+    width: 100%;
 }
 
 .footer-link {
@@ -155,19 +203,20 @@
     text-decoration: none;
 }
 
+
 /* Основной контейнер профиля */
 .profile-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 1200px;
+    width: 75%; /* Фиксированная ширина 65% от ширины страницы */
     margin: 0 auto;
     padding: 20px;
     border-radius: 10px;
     background-color: var(--secondary-bg-color);
 }
 
-/* Верхний блок с информацией пользователя */
+/* Верхний блок с информацией пользователя (сделаем его поуже) */
 .user-info {
     background-color: var(--main-bg-color); /* Цвет, гармонирующий с хедером */
     padding: 20px;
@@ -175,6 +224,8 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     text-align: center;
     color: white; /* Текст выделяется на темном фоне */
+    width: 70%; /* Ширина блока с аватаром, биографией и ником - поуже */
+    margin: 0 auto; /* Выравнивание по центру */
 }
 
 .user-info h3, .user-info p {
@@ -200,7 +251,8 @@
     color: white;
     border: none; /* Без границ */
     resize: none; /* Отключаем изменение размера */
-    min-height: 40px;
+    min-height: 40px;  /* Минимальная высота */
+    max-height: 40px;  /* Максимальная высота */
     font-size: 1rem;
     padding: 5px;
     border-radius: 10px;
@@ -220,12 +272,16 @@
 
 #edit-bio:hover i {
     color: #bababa; /* Цвет иконки при наведении */
+    transform: scale(1.2); /* Увеличиваем иконку на 20% */
 }
 
 /* При нажатии на карандаш (включение режима редактирования) */
 #bio:focus {
     outline: none; /* Убираем стандартную обводку при фокусе */
     background-color: rgb(134, 134, 134); /* Увеличиваем контраст для активного состояния */
+    min-height: 40px; /* Фиксированная минимальная высота */
+    max-height: 40px; /* Фиксированная максимальная высота */
+    height: auto; /* Высота не будет меняться */
 }
 
 /* Чтобы textarea не изменял размеры при редактировании */
@@ -240,6 +296,7 @@
     gap: 20px; /* Добавляем расстояние между блоками */
     flex-wrap: wrap; /* Позволяет блокам переноситься на новую строку на меньших экранах */
     justify-content: space-between; /* Размещает блоки с максимальным расстоянием между ними */
+    width: 100%; /* Нижние блоки будут иметь такую же ширину, как основной блок контента */
 }
 
 /* Настройки для отдельных блоков */
@@ -364,8 +421,7 @@
 
 /* Основной контейнер со списками */
 #reading-list .card-body {
-    display: flex;
-    justify-content: space-between;  /* Располагаем блоки по горизонтали */
+    display: block; /* Меняем на блоковое расположение, чтобы элементы шли друг под другом */
     gap: 20px;
 }
 
@@ -375,7 +431,7 @@
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 30%; /* Фиксированная ширина для каждого блока */
+    width: 100%; /* Блоки занимают всю ширину */
     height: auto !important; /* Высота блока зависит от содержимого */
     box-sizing: border-box;
 }
@@ -384,27 +440,38 @@
 .reading-list-block h6 {
     font-size: 1rem;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 15px; /* Увеличиваем отступ между заголовками */
     color: white;
     text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* Список книг внутри блока */
+/* Кнопка стрелочки */
+.toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.toggle-btn:hover {
+    transform: scale(1.2); /* Увеличение кнопки при наведении */
+}
+
+/* Скрытие/отображение списка */
 .reading-list {
-    display: inline-block;
+    display: none; /* Скрываем списки по умолчанию */
     flex-direction: column;
     gap: 10px;
-    height: auto !important; /* Высота будет зависеть от содержимого */
-    color : white;
+}
 
-}
-.reading-list a {
-    text-decoration: none;
-    color: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.reading-list a:hover {
-    transform: scale(1.1);
+/* Показ списка при клике */
+.reading-list.active {
+    display: block;
 }
 
 /* Карточка книги */
@@ -419,20 +486,28 @@
     justify-content: space-between;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Добавляем для позиционирования кнопки */
+    max-width: 100%; /* Убедитесь, что карточка не выходит за пределы родителя */
+    box-sizing: border-box;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
 }
 
 /* Эффект при наведении */
 .book-card:hover {
-    transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Заголовок книги */
 .book-card h6 {
     font-size: 0.95rem;
-    font-weight: bold;
     color: var(--main-bg-color);
     margin-bottom: 5px;
+    display: flex; /* Делаем заголовок гибким */
+    justify-content: space-between; /* Располагаем название и кнопку по краям */
+    align-items: center;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
 }
 
 /* Изображение книги (если используется) */
@@ -457,12 +532,27 @@
     text-align: center;
     font-size: 0.9rem;
     font-style: italic;
+    margin-bottom: 10px; /* Добавляем небольшой отступ между карточками книг */
 }
 
 /* Для пустых карточек */
 .reading-list .book-card:empty {
     font-size: 1rem;
     color: #888;
+}
+
+/* Ссылки */
+.reading-list a {
+    text-decoration: none;
+    color: white; /* Белый текст для ссылок */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
+}
+
+/* Эффект увеличения для ссылок при наведении */
+.reading-list a:hover {
+    transform: scale(1.1);
 }
 
 /* Для кнопки удаления */
@@ -473,7 +563,6 @@
     font-size: 18px;
     cursor: pointer;
     transition: color 0.3s ease;
-    margin-left: 10px; /* Добавляем отступ между названием книги и кнопкой */
 }
 
 /* Эффект при наведении на кнопку удаления */
@@ -481,15 +570,159 @@
     color: darkred;
 }
 
-/* Размещение кнопки удаления рядом с книгой */
-.reading-list li {
-    display: flex;
-    justify-content: space-between; /* Расположение книги и кнопки на одной линии */
-    align-items: center;
-    margin-bottom: 10px; /* Отступ между элементами списка */
+/* Размещение кнопки удаления справа от названия книги */
+.book-card .delete-button {
+    position: absolute; /* Абсолютное позиционирование для кнопки */
+    right: 10px; /* Отступ от правого края */
+    top: 50%; /* Центрируем по вертикали относительно заголовка */
+    transform: translateY(-50%); /* Подправляем вертикальное расположение */
+    z-index: 1; /* Убедитесь, что кнопка находится поверх других элементов */
 }
 
-/* Мелкий отступ между названием книги и кнопкой */
-.reading-list li a {
-    margin-right: 10px;
+/* Контейнер для формы логина */
+#login-form-container {
+    background-color: var(--header-bg-color); /* Цвет фона как у хедера */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: absolute; /* Используем absolute для позиционирования */
+    top: 50%; /* Центрируем по вертикали */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translate(-50%, -60%); /* Смещаем на 50% в обеих осях для точного выравнивания */
+}
+
+/* Заголовок страницы "Вход" */
+.login-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+    margin-bottom: 20px; /* Отступ снизу */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для заголовка */
+}
+
+/* Стили для инпутов */
+#login-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+}
+
+#login-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+#login-form input:focus {
+    border-color: var(--input-focus-color);
+    outline: none;
+}
+
+/* Стили для кнопки */
+#login-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #868686;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+#login-form button:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+/* Сообщения */
+#message {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--text-color);
+}
+
+/* Контейнер для формы регистрации */
+#registration-form-container {
+    background-color: var(--header-bg-color); /* Цвет фона как у хедера */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: absolute; /* Используем absolute для позиционирования */
+    top: 50%; /* Центрируем по вертикали */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translate(-50%, -50%); /* Смещаем на 50% в обеих осях для точного выравнивания */
+}
+
+/* Заголовок страницы "Регистрация" */
+.registration-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+    margin-bottom: 20px; /* Отступ снизу */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для заголовка */
+}
+
+/* Стили для инпутов */
+#registration-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+}
+
+#registration-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+#registration-form input:focus {
+    border-color: var(--input-focus-color);
+    outline: none;
+}
+
+/* Стили для кнопки */
+#registration-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #868686;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+#registration-form button:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+/* Сообщения */
+#message {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--text-color);
 }

@@ -4,7 +4,7 @@
 {% block title %}Профиль: {{ profile_user.username }}{% endblock %}
 
 {% block content %}
-<div class="profile-container" data-username="{{ profile_user.username }}" data-csrf="{{ csrf_token }}">
+<div class="profile-container" data-username="{{ profile_user.username }}" data-csrf="{{ csrf_token }}" data-is-owner="{{ is_owner }}">
     <!-- Верхний блок: информация о пользователе -->
     <section class="user-info text-center mb-4">
         <div class="position-relative d-inline-block avatar-container">
@@ -62,26 +62,33 @@
                 <h5 class="mb-0">Список чтения</h5>
             </div>
             <br>
-            <div class="card-body d-flex flex-wrap gap-3">
+            <div class="card-body">
                 <!-- Блок "Читаю сейчас" -->
                 <div class="reading-list-block">
-                    <h6>Читаю сейчас:</h6>
+                    <h6>Читаю сейчас:
+                        <button class="toggle-btn" onclick="toggleList('currently-reading-list')">▼</button>
+                    </h6>
                     <div id="currently-reading-list" class="reading-list">
                         <div class="book-card">Загрузка...</div>
                     </div>
                 </div>
-
+                <br>
                 <!-- Блок "Завершенные книги" -->
                 <div class="reading-list-block">
-                    <h6>Завершенные книги:</h6>
+                    <h6>Завершенные книги:
+                        <button class="toggle-btn" onclick="toggleList('completed-list')">▼</button>
+                    </h6>
                     <div id="completed-list" class="reading-list">
                         <div class="book-card">Загрузка...</div>
                     </div>
                 </div>
+                <br>
 
                 <!-- Блок "Книги, которые планирую прочитать" -->
                 <div class="reading-list-block">
-                    <h6>Книги, которые планирую прочитать:</h6>
+                    <h6>Планирую прочитать:
+                        <button class="toggle-btn" onclick="toggleList('to-read-list')">▼</button>
+                    </h6>
                     <div id="to-read-list" class="reading-list">
                         <div class="book-card">Загрузка...</div>
                     </div>

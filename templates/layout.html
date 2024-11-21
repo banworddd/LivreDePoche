@@ -20,18 +20,20 @@
             <!-- Основная навигация -->
             <nav class="main-nav">
                 <ul class="nav-list">
-                    <li><a href="{% url 'index' %}" class="nav-link">Главная</a></li>
                     <li><a href="{% url 'books' %}" class="nav-link">Книги</a></li>
                     <li><a href="{% url 'authors' %}" class="nav-link">Авторы</a></li>
                 </ul>
             </nav>
 
-            <!-- Иконка пользователя -->
+            <!-- Пустое пространство, чтобы разделить левую и правую часть -->
+            <div class="spacer"></div>
+
+            <!-- Иконка пользователя или ссылки для неавторизованных -->
             {% if user.is_authenticated %}
                 <div class="user-menu">
                     <i class="bi bi-person-circle user-icon"></i>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'users:profile' request.user.username %}" class="nav-link">Мой профиль</a></li>
+                        <li><a href="{% url 'users:profile' request.user.username %}" class="nav-link">Профиль</a></li>
                         <li><a href="{% url 'users:logout' %}" class="nav-link">Выйти</a></li>
                     </ul>
                 </div>
@@ -55,7 +57,7 @@
     <!-- Подвал сайта -->
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2024 <a href="https://t.me/banworddd10" class="footer-link">banworddd</a></p>
+             <a href="https://t.me/banworddd10" class="footer-link">banworddd</a>
         </div>
     </footer>
 </body>

@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const profileContainer = document.querySelector('.profile-container');
     const username = profileContainer.dataset.username;  // Извлекаем имя пользователя
     const csrfToken = profileContainer.dataset.csrf;
+    const isOwner = profileContainer.dataset.isOwner === 'True';
 
     // Показ карандаша на аватарке
     const avatarImage = document.getElementById('avatar-image');
@@ -116,78 +117,77 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-        // Загрузка списка чтения
-        fetch(`/api/reading_list/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                const currentlyReadingList = document.getElementById('currently-reading-list');
-                const completedList = document.getElementById('completed-list');
-                const toReadList = document.getElementById('to-read-list');
-
-                currentlyReadingList.innerHTML = '';
-                completedList.innerHTML = '';
-                toReadList.innerHTML = '';
-
-                if (data.length === 0) {
-                    currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
-                    completedList.innerHTML = '<li>Нет завершенных книг.</li>';
-                    toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
-                } else {
-                    const bookRequests = data.map(item => {
-                        return fetch(`/api/book/${item.book}/`);
-                    });
-
-                    Promise.all(bookRequests)
-                        .then(responses => Promise.all(responses.map(res => res.json())))
-                        .then(books => {
-                            books.forEach((book, index) => {
-                                const item = data[index];
-                                const li = document.createElement('li');
-                                li.classList.add('book-card');
-                                li.innerHTML = `
-                                    <a href="/book/${book.id}/">${book.title}</a>
-                                    ${item.read_date ? ` - Прочитано: ${item.read_date}` : ''}
-                                `;
-
-                                // Если это владелец, показываем кнопку удаления
-                                if ("{{ is_owner }}" === "True") {
-                                    const deleteButton = document.createElement('button');
-                                    deleteButton.classList.add('delete-button');
-                                    deleteButton.innerHTML = '×';
-                                    deleteButton.onclick = function() {
-                                        deleteBook(item.id); // Вызов функции удаления
-                                    };
-                                    li.appendChild(deleteButton);
-                                }
-
-                                // Добавляем книгу в соответствующий список
-                                if (item.status === 'currently_reading') {
-                                    currentlyReadingList.appendChild(li);
-                                } else if (item.status === 'completed') {
-                                    completedList.appendChild(li);
-                                } else if (item.status === 'planned') {
-                                    toReadList.appendChild(li);
-                                }
-                            });
-                        })
-                        .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
-                }
-            })
-            .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
-
         // Функция удаления книги
-        function deleteBook(readingListId) {
-            fetch(`/api/reading_list/${username}/${readingListId}/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json'
-                }
+    function deleteBook(readingListId) {
+        fetch(`/api/reading_list/${username}/${readingListId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) location.reload();
+                else throw new Error('Ошибка удаления книги');
             })
-            .then(response => response.json())
-            .then(() => location.reload())
             .catch(error => console.error('Ошибка при удалении книги:', error));
-        }
+    }
+
+    // Загрузка списка чтения
+    fetch(`/api/reading_list/${username}/`)
+        .then(response => response.json())
+        .then(data => {
+            const currentlyReadingList = document.getElementById('currently-reading-list');
+            const completedList = document.getElementById('completed-list');
+            const toReadList = document.getElementById('to-read-list');
+
+            currentlyReadingList.innerHTML = '';
+            completedList.innerHTML = '';
+            toReadList.innerHTML = '';
+
+            if (data.length === 0) {
+                currentlyReadingList.innerHTML = '<li>Нет книг в списке чтения.</li>';
+                completedList.innerHTML = '<li>Нет завершенных книг.</li>';
+                toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
+            } else {
+                const bookRequests = data.map(item => fetch(`/api/book/${item.book}/`));
+
+                Promise.all(bookRequests)
+                    .then(responses => Promise.all(responses.map(res => res.json())))
+                    .then(books => {
+                        books.forEach((book, index) => {
+                            const item = data[index];
+                            const li = document.createElement('li');
+                            li.classList.add('book-card');
+                            li.innerHTML = `
+                                <a href="/book/${book.id}/">${book.title}</a>
+                                ${item.read_date ? ` Дата Прочтения: ${item.read_date}` : ''}
+                            `;
+
+                            if (isOwner) {
+                                const deleteButton = document.createElement('button');
+                                deleteButton.classList.add('delete-button');
+                                deleteButton.innerHTML = '×';
+                                deleteButton.onclick = function () {
+                                    deleteBook(item.id);
+                                };
+                                li.appendChild(deleteButton);
+                            }
+
+                            if (item.status === 'currently_reading') {
+                                currentlyReadingList.appendChild(li);
+                            } else if (item.status === 'completed') {
+                                completedList.appendChild(li);
+                            } else if (item.status === 'planned') {
+                                toReadList.appendChild(li);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Ошибка при загрузке информации о книгах:', error));
+            }
+        })
+        .catch(error => console.error('Ошибка при загрузке списка чтения:', error));
+
 
 
     // Загрузка отзывов
@@ -234,3 +234,8 @@ document.addEventListener("DOMContentLoaded", function() {
             reviewsList.innerHTML = '<li class="review-item list-group-item" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; border-radius: 10px; padding: 15px; margin-bottom: 15px;">Не удалось загрузить отзывы.</li>';
         });
 });
+
+function toggleList(listId) {
+    const list = document.getElementById(listId);
+    list.classList.toggle('active'); // Переключаем класс для показа/скрытия списка
+}
