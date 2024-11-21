@@ -11,7 +11,7 @@
     --main-bg-color: #b9b9b9;
     --link-hover-color: #878787;
     --button-hover-color: #0056b3;
-    --secondary-bg-color: #fdfdfd;
+    --secondary-bg-color: #b8b8b8;
     --header-bg-color: #b9b9b9;
     --footer-bg-color: #b9b9b9;
     --border-color: #ccc;
@@ -213,7 +213,7 @@ main {
     margin: 0 auto;
     padding: 20px;
     border-radius: 10px;
-    background-color: var(--secondary-bg-color);
+    background-color: white;
 }
 
 /* Верхний блок с информацией пользователя (сделаем его поуже) */
@@ -726,3 +726,194 @@ main {
     text-align: center;
     color: var(--text-color);
 }
+
+/* Контейнер приветственного блока */
+#welcome-container {
+    background-color: #b8b8b8;
+    padding: 40px;
+    margin: 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Центрируем текст */
+    max-width: 800px; /* Ограничиваем ширину */
+    color: white;
+}
+
+/* Заголовок приветствия */
+.welcome-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Текст приветствия */
+.welcome-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Список особенностей */
+.features-list {
+    list-style-type: none; /* Убираем стандартные маркеры списка */
+    padding: 0;
+    margin: 20px 0;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.features-list li {
+    font-size: 16px;
+    margin: 10px 0;
+    text-align: left; /* Выравниваем текст списка по левому краю */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Выделяем текст списка и добавляем иконки */
+.features-list li::before {
+    content: '✔️';
+    margin-right: 10px;
+    color: var(--main-bg-color);
+    font-size: 18px;
+}
+
+/* Призыв к действию */
+.welcome-call-to-action {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-top: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Контейнер для списка книг */
+#book-list-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1000px; /* Ограничиваем ширину */
+    background-color: #b8b8b8;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок страницы */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Список книг */
+.book-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Карточка книги */
+.book-card {
+    background-color: #878787;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Эффект наведения на карточку */
+.book-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок книги */
+.book-title a {
+    text-decoration: none;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* Эффект наведения на заголовок книги */
+.book-title a:hover {
+    transform: scale(1.1);
+}
+
+/* Описание книги */
+.book-summary,
+.book-description {
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 10px 0;
+}
+
+/* Контейнер для списка авторов */
+#author-list-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1000px; /* Ограничиваем ширину */
+    background-color: #b8b8b8; /* Цвет как у страницы книг */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок страницы */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white; /* Белый цвет заголовка */
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень заголовка */
+}
+
+/* Список авторов */
+.author-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Карточка автора */
+.author-card {
+    background-color: #878787; /* Цвет как у карточек книг */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Эффект наведения на карточку */
+.author-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Имя автора */
+.author-name a {
+    text-decoration: none;
+    color: white; /* Белый цвет текста */
+    font-size: 22px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* Эффект наведения на имя автора */
+.author-name a:hover {
+    transform: scale(1.1);
+}
+
+/* Дополнительная информация об авторе */
+.author-info {
+    font-size: 16px;
+    color: white;
+    margin: 10px 0;
+}
+
