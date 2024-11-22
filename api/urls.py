@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import UserRegistration, UserLogin, ProfileView, ReadingListView, BookView, BookReviewView, UserBookReviewsView
+from .views import UserRegistration, UserLogin, ProfileView, ReadingListView, BookView, BookReviewView, UserBookReviewsView, BookListView
 
 app_name = 'api'
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path('book/<int:book_id>/reviews/', BookReviewView.as_view(), name='book_reviews'),
     path('book/<int:book_id>/reviews/<int:review_id>/', BookReviewView.as_view(), name='book_review_detail'),
     path('user_reviews/<str:username>/', UserBookReviewsView.as_view(), name='user_reviews'),
+    path('books/', BookListView.as_view(), name='book-list'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

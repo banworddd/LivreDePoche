@@ -1,40 +1,40 @@
 {% extends "layout.html" %}
+{% load static %}
 
 {% block title %}
-{{ book.title }} - Детали книги
+Детали книги
 {% endblock %}
 
 {% block content %}
-<h1>{{ book.title }}</h1>
-<p><strong>Автор:</strong> {{ book.author }}</p>
-<p><strong>Описание:</strong> {{ book.description }}</p>
-<p><strong>Год издания:</strong> {{ book.year }}</p>
+<h1 id="book-title">Загрузка...</h1>
+<p><strong>Автор:</strong> <span id="book-author">Загрузка...</span></p>
+<p><strong>Описание:</strong> <span id="book-description">Загрузка...</span></p>
+<p><strong>Год издания:</strong> <span id="book-year">Загрузка...</span></p>
 
 {% if user.is_authenticated %}
-<div id="reading-list-buttons">
-    <h3>Добавить в список</h3>
-    <button id="add-to-wishlist" data-status="planned">Добавить в список желаемого</button>
-    <button id="add-to-reading" data-status="currently_reading">Добавить в список читаемого</button>
-    <button id="add-to-completed" data-status="completed">Добавить в список прочитанного</button>
-</div>
+    <div id="reading-list-buttons" data-username="{{ user.username }}">
+        <h3>Добавить в список</h3>
+        <button id="add-to-wishlist" data-status="planned">Добавить в список желаемого</button>
+        <button id="add-to-reading" data-status="currently_reading">Добавить в список читаемого</button>
+        <button id="add-to-completed" data-status="completed">Добавить в список прочитанного</button>
+    </div>
 {% endif %}
 
-<h2>Отзывы</h2>
-<ul id="reviews-list">
-    {% for review in reviews %}
-        <li>
-            <strong>{{ review.user.username }}</strong> - {{ review.rating }}⭐
-            <p>{{ review.review_text }}</p>
-            <small>Дата: {{ review.created_at }}</small>
-        </li>
-    {% empty %}
-        <li>Нет отзывов для этой книги.</li>
-    {% endfor %}
-</ul>
+<div class="reviews-section">
+    <!-- Форма для добавления или редактирования отзыва -->
+    <form id="review-form">
+        <textarea id="review-text" placeholder="Напишите ваш отзыв..." required></textarea>
+        <button type="submit" id="review-submit-button">Добавить отзыв</button>
+    </form>
+
+    <!-- Список отзывов -->
+    <ul id="reviews-list">
+        <!-- Отзывы будут динамически добавляться сюда -->
+    </ul>
+</div>
 
 {% if user.is_authenticated %}
-    {% if not user_reviewed %}
-    <div id="review-form-container">
+    <div id="review-form-container" style="display:none;">
         <h3>Добавить отзыв</h3>
         <form id="review-form">
             <label for="rating">Оценка:</label>
@@ -52,128 +52,10 @@
             <button type="submit">Добавить отзыв</button>
         </form>
     </div>
-    {% else %}
-    <p>Вы уже оставили отзыв для этой книги.</p>
-    {% endif %}
 {% else %}
 <p><a href="{% url 'users:login' %}">Войдите</a>, чтобы оставить отзыв или добавить книгу в список.</p>
 {% endif %}
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const bookId = "{{ book.id }}";
-    const reviewsList = document.getElementById('reviews-list');
+<script src="{% static 'js/book_detail.js' %}"></script>
 
-    // Функция для получения отзывов через API
-    function fetchReviews() {
-        fetch(`/api/book/${bookId}/reviews/`)
-            .then(response => response.json())
-            .then(data => {
-                reviewsList.innerHTML = "";
-                if (data.length === 0) {
-                    reviewsList.innerHTML = "<li>Нет отзывов для этой книги.</li>";
-                } else {
-                    data.forEach(review => {
-                        const reviewItem = document.createElement('li');
-                        reviewItem.innerHTML = `
-                            <strong>${review.user}</strong> - ${review.rating}⭐
-                            <p>${review.review_text}</p>
-                            <small>Дата: ${review.review_date}</small>
-                            ${review.user === "{{ user.username }}" ? `
-                                <button class="edit-review" data-id="${review.id}">Редактировать</button>
-                                <button class="delete-review" data-id="${review.id}">Удалить</button>
-                            ` : ""}
-                        `;
-                        reviewsList.appendChild(reviewItem);
-                    });
-                }
-            });
-    }
-
-    // Обработчик для добавления нового отзыва
-    const reviewForm = document.getElementById('review-form');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = {
-                rating: document.getElementById('rating').value,
-                review_text: document.getElementById('review-text').value
-            };
-
-            fetch(`/api/book/${bookId}/reviews/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.id) {
-                    fetchReviews(); // Обновить список отзывов
-                    reviewForm.reset(); // Очистить форму
-                } else {
-                    console.error('Ошибка:', data);
-                }
-            });
-        });
-    }
-
-    // Обработчики для редактирования и удаления отзывов
-    reviewsList.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-review')) {
-            const reviewId = e.target.getAttribute('data-id');
-            fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-            }).then(() => fetchReviews());
-        }
-
-        if (e.target.classList.contains('edit-review')) {
-            const reviewId = e.target.getAttribute('data-id');
-            const newReviewText = prompt("Введите новый текст отзыва:");
-            const newRating = prompt("Введите новую оценку (1-5):");
-            if (newReviewText && newRating) {
-                fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                    body: JSON.stringify({ review_text: newReviewText, rating: newRating }),
-                }).then(() => fetchReviews());
-            }
-        }
-    });
-
-    // Функция для работы со списками чтения
-    const readingButtons = document.querySelectorAll("#reading-list-buttons button");
-    readingButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const status = this.getAttribute("data-status");
-            fetch(`/api/reading_list/{{ user.username }}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({ book: bookId, status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error(data.error);
-                } else {
-                    alert("Книга успешно добавлена в список!");
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-        });
-    });
-
-    // Загрузка отзывов при загрузке страницы
-    fetchReviews();
-});
-</script>
 {% endblock %}

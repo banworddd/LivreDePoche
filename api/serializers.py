@@ -26,37 +26,32 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)  # Указываем, что это поле только для записи
-    avatar = serializers.ImageField(required=False, allow_null=True)  # Добавлено поле для аватара
+    password = serializers.CharField(write_only=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'bio', 'password', 'avatar']  # Включите поле 'avatar'
+        fields = ['id', 'username', 'email', 'bio', 'password', 'avatar']
+
+    @staticmethod
+    def validate_email(value):
+        email = value.lower()
+        if CustomUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Этот email уже используется.")
+        return email
 
     def create(self, validated_data):
-        password = validated_data.pop('password')  # Удаляем пароль из validated_data
-        user = CustomUser(**validated_data)  # Создаем экземпляр пользователя без пароля
-        user.set_password(password)  # Устанавливаем пароль с хэшированием
-        user.save()  # Сохраняем пользователя в базе данных
+        validated_data['email'] = validated_data['email'].lower()  # Преобразуем email в нижний регистр
+        password = validated_data.pop('password')
+        user = CustomUser(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
 
     def update(self, instance, validated_data):
-        # Обновляем данные пользователя
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.bio = validated_data.get('bio', instance.bio)
-
-        # Обработка аватара, если он предоставлен
-        if 'avatar' in validated_data:
-            instance.avatar = validated_data['avatar']
-
-        # Устанавливаем новый пароль, если он был предоставлен
-        password = validated_data.get('password', None)
-        if password:
-            instance.set_password(password)
-
-        instance.save()  # Сохраняем изменения
-        return instance
+        if 'email' in validated_data:
+            validated_data['email'] = validated_data['email'].lower()  # Преобразуем email в нижний регистр
+        return super().update(instance, validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
@@ -64,22 +59,25 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        # Приводим email к нижнему регистру
+        email = attrs.get('email').lower()
         password = attrs.get('password')
 
-        # Попытка получить пользователя по электронной почте
+        # Пытаемся найти пользователя
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError(
-                {"email": "Пользователь с таким адресом электронной почты не существует."})
+                {"email": "Пользователь с таким адресом электронной почты не существует."}
+            )
 
-        # Проверка пароля
+        # Проверяем пароль
         if not user.check_password(password):
             raise serializers.ValidationError({"password": "Неверный пароль."})
 
-        # Возвращаем валидированные данные
-        return attrs  # Возвращаем атрибуты, которые были валидированы
+        # Сохраняем пользователя для дальнейшего использования
+        attrs['user'] = user
+        return attrs
 
 
 class ReadingListSerializer(serializers.ModelSerializer):

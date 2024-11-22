@@ -1,35 +1,42 @@
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block title %}Список книг{% endblock %}
 
 {% block content %}
-<div id="book-list-container">
-    <!-- Заголовок страницы -->
-    <h1 class="page-title">📚 Список книг</h1>
+<div class="books-page-container">
+    <!-- Блок с заголовком, фильтрами и поиском -->
+    <div class="search-filters-container">
+        <h1 class="page-title">Список книг</h1>
+        <div class="search-filters">
+            <!-- Поле поиска -->
+            <input id="search-input" type="text" class="form-control search-input" placeholder="Введите название, автора или жанр" />
+            <button id="search-button" class="btn btn-light">
+                <i class="bi bi-search"></i> <!-- Иконка поиска -->
+            </button>
+        </div>
 
-    <!-- Список книг -->
-    <ul class="book-list">
-        {% for book in books %}
-            <li class="book-card">
-                <!-- Заголовок книги с ссылкой на детали -->
-                <h2 class="book-title">
-                    <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a>
-                </h2>
+        <!-- Фильтры -->
+        <div class="filters">
+            <select id="author-filter" class="form-select">
+                <option value="">Все авторы</option>
+            </select>
 
-                <!-- Список авторов -->
-                <p><strong>Авторы:</strong> 
-                    {% for author in book.authors.all %}
-                        {{ author.name }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
+            <select id="genre-filter" class="form-select">
+                <option value="">Все жанры</option>
+            </select>
 
-                <!-- Краткое описание книги -->
-                <p class="book-summary"><strong>Краткое описание:</strong> {{ book.summary }}</p>
+            <button id="apply-filters" class="btn btn-primary">Применить фильтры</button>
+        </div>
+    </div>
 
-                <!-- Полное описание книги -->
-                <p class="book-description"><strong>Описание:</strong> {{ book.description }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+    <!-- Блок с книгами -->
+    <div class="book-list-container">
+        <ul id="book-list" class="book-list">
+            <!-- Книги будут загружены через JS -->
+        </ul>
+    </div>
 </div>
+
+<script src="{% static 'js/books.js' %}"></script>
 {% endblock %}

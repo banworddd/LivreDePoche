@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -40,20 +41,18 @@ class UserLogin(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
+            # Получаем пользователя из валидированных данных
+            user = serializer.validated_data['user']
 
-            try:
-                user = CustomUser.objects.get(email=email)
-                if user.check_password(password):
-                    login(request, user)  # Убедитесь, что пользователь логинится
-                    return Response({"status": "Login successful"}, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": "Неверный пароль."}, status=status.HTTP_400_BAD_REQUEST)
-            except CustomUser.DoesNotExist:
-                return Response({"error": "Пользователь с таким адресом электронной почты не существует."}, status=status.HTTP_404_NOT_FOUND)
+            # Логиним пользователя
+            login(request, user)
 
+            # Возвращаем успешный ответ
+            return Response({"status": "Login successful"}, status=status.HTTP_200_OK)
+
+        # Если данные не валидны, возвращаем ошибки
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ProfileView(APIView):
@@ -192,6 +191,43 @@ class UserBookReviewsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Отзывы не найдены."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class BookListView(APIView):
+    def get(self, request):
+        # Получаем параметры фильтрации из запроса
+        author_name = request.GET.get('author', None)
+        genre_name = request.GET.get('genre', None)
+        search_query = request.GET.get('search', None)
+
+        books = Book.objects.all()
+
+        # Фильтрация по автору
+        if author_name:
+            author_name = author_name.strip()  # Убираем лишние пробелы
+            books = books.filter(authors__name__icontains=author_name)
+
+        # Фильтрация по жанру
+        if genre_name:
+            genre_name = genre_name.strip()  # Убираем лишние пробелы
+            books = books.filter(genre__name__icontains=genre_name)
+
+        # Фильтрация по поисковому запросу
+        if search_query:
+            search_query = search_query.strip()  # Убираем лишние пробелы
+            query = Q()
+            for keyword in search_query.split():  # Разделяем поисковую строку на слова
+                query |= Q(title__icontains=keyword) | Q(authors__name__icontains=keyword) | Q(genre__name__icontains=keyword)
+            books = books.filter(query)
+
+        # Применяем distinct, чтобы избежать повторений
+        books = books.distinct()
+
+        # Сериализация данных и возвращение ответа
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
+
+
 
 def send_welcome_email(user):
     subject = 'Добро пожаловать в наш сервис!'

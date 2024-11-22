@@ -788,71 +788,6 @@ main {
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Контейнер для списка книг */
-#book-list-container {
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 1000px; /* Ограничиваем ширину */
-    background-color: #b8b8b8;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Заголовок страницы */
-.page-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 30px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Список книг */
-.book-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-/* Карточка книги */
-.book-card {
-    background-color: #878787;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Эффект наведения на карточку */
-.book-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-/* Заголовок книги */
-.book-title a {
-    text-decoration: none;
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    transition: 0.3s ease;
-}
-
-/* Эффект наведения на заголовок книги */
-.book-title a:hover {
-    transform: scale(1.1);
-}
-
-/* Описание книги */
-.book-summary,
-.book-description {
-    font-size: 16px;
-    color: var(--text-color);
-    margin: 10px 0;
-}
-
 /* Контейнер для списка авторов */
 #author-list-container {
     padding: 20px;
@@ -917,3 +852,170 @@ main {
     margin: 10px 0;
 }
 
+/* Контейнер для страницы */
+.books-page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Центрирование по вертикали */
+    align-items: center; /* Центрирование по горизонтали */
+    min-height: 100vh; /* Занимает всю высоту страницы */
+    padding: 20px;
+    width: 100%; /* Убедимся, что контейнер занимает всю ширину */
+}
+
+/* Заголовок страницы */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Строка поиска и фильтры */
+.search-filters-container {
+    width: 60%; /* Фиксированная ширина 60% от ширины страницы */
+    max-width: 1000px; /* Максимальная ширина */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 40px;
+    align-items: center;
+    background-color: #b8b8b8; /* Фон, как у блока с книгами */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* Строка поиска и фильтры */
+.search-filters {
+    width: 100%; /* Сделаем блок с поиском и фильтрами на всю ширину */
+    display: flex;
+    flex-direction: row; /* Изменяем направление на строку */
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ввод текста для поиска */
+#search-input {
+    padding: 8px;
+    width: 300px;
+    border-radius: 30px; /* Более закругленные края */
+    border: 1px solid var(--border-color);
+    font-size: 16px;
+    background-color: #f4f4f4; /* Цвет фона */
+    color: #000000; /* Белый текст */
+    ::placeholder {
+        color: #000000; /* Цвет приглашающего текста */
+    }
+}
+
+/* Убираем обводку при активации поля ввода */
+#search-input:focus {
+    outline: none; /* Убираем стандартную обводку */
+    box-shadow: none; /* Убираем тень при фокусе */
+}
+
+/* Кнопка "Поиск" */
+#search-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 30px; /* Закругленные края кнопки */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#search-button:hover {
+    background-color: #0056b3;
+}
+
+/* Фильтры */
+.filters {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Кнопка "Применить фильтры" */
+#apply-filters {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#apply-filters:hover {
+    background-color: #218838;
+}
+
+/* Для селектов фильтров */
+.form-select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    font-size: 16px;
+    width: 200px;
+}
+
+/* Контейнер для списка книг */
+.book-list-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1000px; /* Ограничиваем ширину */
+    background-color: #b8b8b8;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Список книг */
+.book-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Карточка книги */
+.book-card {
+    background-color: #878787;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Эффект наведения на карточку */
+.book-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок книги */
+.book-title a {
+    text-decoration: none;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* Эффект наведения на заголовок книги */
+.book-title a:hover {
+    transform: scale(1.1);
+}
+
+/* Описание книги */
+.book-summary,
+.book-description {
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 10px 0;
+}

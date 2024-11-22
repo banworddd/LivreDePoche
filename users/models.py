@@ -10,6 +10,11 @@ class CustomUser(AbstractUser):
     bio = models.TextField(max_length=250, blank=True, null=True)
     email = models.EmailField(unique=True)
 
+    def save(self, *args, **kwargs):
+        if self.email:
+            self.email = self.email.lower()  # Преобразуем email в нижний регистр
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.username
 
