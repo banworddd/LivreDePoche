@@ -1,40 +1,32 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const bookId = window.location.pathname.split("/")[2];  // Извлекаем book_id из URL
-
+    const bookId = window.location.pathname.split("/")[2];
     const addToReadingListButtons = document.querySelectorAll("#reading-list-buttons button");
     const username = document.getElementById('reading-list-buttons')?.dataset.username;
     const reviewsList = document.getElementById('reviews-list');
     const userReviewHeader = document.getElementById('user-review-header');
+    let selectedRating = 0;
 
-    // Функция для получения информации о книге через API
     function fetchBookDetails() {
         fetch(`/api/book/${bookId}/`)
             .then(response => response.json())
             .then(data => {
-                // Обновляем данные на странице
                 document.getElementById('book-title').textContent = data.title;
-                document.getElementById('book-author').textContent = data.author;
+                document.getElementById('book-author').textContent = data.authors.length > 0 ? data.authors[0].name : 'Неизвестный автор';
                 document.getElementById('book-description').textContent = data.description;
-                document.getElementById('book-year').textContent = data.year;
             })
             .catch(error => {
                 console.error("Ошибка при загрузке данных о книге:", error);
             });
     }
 
-    // Функция для получения отзывов через API
     function fetchReviews() {
         fetch(`/api/book/${bookId}/reviews/`)
             .then(response => response.json())
             .then(data => {
-                reviewsList.innerHTML = "";  // Очищаем список отзывов
-
+                reviewsList.innerHTML = "";
                 let userReviewFound = false;
-
-                // Проверяем, есть ли отзыв у текущего пользователя
                 const userReview = data.find(review => review.user === username);
 
-                // Если отзыв пользователя есть, выводим его в хедер
                 if (userReview) {
                     userReviewFound = true;
                     userReviewHeader.innerHTML = `
@@ -42,35 +34,31 @@ document.addEventListener("DOMContentLoaded", function() {
                             <strong>${userReview.user}</strong> - ${userReview.rating}⭐
                             <p>${userReview.review_text}</p>
                             <small>Дата: ${new Date(userReview.review_date).toLocaleDateString()}</small>
-                            <button class="edit-review" data-id="${userReview.id}">Редактировать</button>
-                            <button class="delete-review" data-id="${userReview.id}">Удалить</button>
+                            <button class="edit-review btn" data-id="${userReview.id}">Редактировать</button>
+                            <button class="delete-review btn" data-id="${userReview.id}">Удалить</button>
                         </div>
                     `;
                 }
 
-                // Если у пользователя нет отзыва, показываем форму
                 if (!userReviewFound) {
                     userReviewHeader.innerHTML = `
                         <h3>Добавить отзыв</h3>
+                        <div id="rating-stars" class="rating-stars">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
                         <form id="review-form">
-                            <label for="rating">Оценка:</label>
-                            <select id="rating" name="rating" required>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
+                            <textarea id="review-text" name="review_text" rows="4" class="review-textarea" required></textarea>
+                            <div id="rating-error" class="error-message" style="display: none;">Пожалуйста, выберите рейтинг перед отправкой отзыва.</div>
                             <br>
-                            <label for="review-text">Текст отзыва:</label>
-                            <textarea id="review-text" name="review_text" rows="4" required></textarea>
-                            <br>
-                            <button type="submit">Добавить отзыв</button>
+                            <button type="submit" class="btn">Добавить отзыв</button>
                         </form>
                     `;
                 }
 
-                // Отображаем остальные отзывы
                 data.forEach(review => {
                     if (review.user !== username) {
                         const reviewItem = document.createElement('li');
@@ -83,13 +71,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
 
-                // Привязываем обработчик события submit к форме после её добавления
                 const reviewForm = document.getElementById('review-form');
                 if (reviewForm) {
                     reviewForm.addEventListener("submit", submitReview);
                 }
 
-                // Привязываем обработчики событий для кнопок "Редактировать" и "Удалить"
                 const editButtons = document.querySelectorAll('.edit-review');
                 editButtons.forEach(button => {
                     button.addEventListener('click', () => {
@@ -105,20 +91,32 @@ document.addEventListener("DOMContentLoaded", function() {
                         deleteReview(reviewId);
                     });
                 });
+
+                const stars = document.querySelectorAll('.star');
+                stars.forEach(star => {
+                    star.addEventListener('click', () => {
+                        selectedRating = star.getAttribute('data-value');
+                        updateStars(selectedRating);
+                        document.getElementById('rating-error').style.display = 'none'; // Скрываем сообщение об ошибке при выборе рейтинга
+                    });
+                });
             })
             .catch(error => {
                 console.error("Ошибка при загрузке отзывов:", error);
             });
     }
 
-    // Функция для отправки нового отзыва
     function submitReview(event) {
         event.preventDefault();
-        const rating = document.getElementById('rating').value;
+        const ratingError = document.getElementById('rating-error');
+        if (selectedRating === 0) {
+            ratingError.style.display = 'block';
+            return;
+        }
         const reviewText = document.getElementById('review-text').value;
 
         const reviewData = {
-            rating: rating,
+            rating: selectedRating,
             review_text: reviewText
         };
 
@@ -133,8 +131,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-                fetchReviews(); // Обновить список отзывов после успешного добавления
-                window.location.href = `/book/${bookId}/`;  // Перенаправить обратно на страницу книги
+                fetchReviews();
+                window.location.href = `/book/${bookId}/`;
             } else {
                 console.error('Ошибка при добавлении отзыва:', data);
             }
@@ -144,51 +142,58 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Функция для редактирования отзыва
     function editReview(reviewId) {
         const reviewElement = document.querySelector(`[data-id="${reviewId}"]`).parentElement;
         const reviewText = reviewElement.querySelector('p').textContent;
-        const rating = reviewElement.querySelector('strong').textContent[0];  // Получаем рейтинг
+        const rating = reviewElement.querySelector('strong').textContent[0];
 
-        // Заполняем форму редактирования
         userReviewHeader.innerHTML = `
             <h3>Редактировать отзыв</h3>
+            <div id="rating-stars" class="rating-stars">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
             <form id="review-form" data-review-id="${reviewId}">
-                <label for="rating">Оценка:</label>
-                <select id="rating" name="rating" required>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
+                <textarea id="review-text" name="review_text" rows="4" class="review-textarea" required>${reviewText}</textarea>
+                <div id="rating-error" class="error-message" style="display: none;">Пожалуйста, выберите рейтинг перед отправкой отзыва.</div>
                 <br>
-                <label for="review-text">Текст отзыва:</label>
-                <textarea id="review-text" name="review_text" rows="4" required>${reviewText}</textarea>
-                <br>
-                <button type="submit">Обновить отзыв</button>
+                <button type="submit" class="btn">Обновить отзыв</button>
             </form>
         `;
 
-        // Устанавливаем значение рейтинга
-        document.getElementById('rating').value = rating;
+        selectedRating = 0; // Сброс выбранного рейтинга
+        updateStars(selectedRating);
 
-        // Привязываем обработчик события submit к форме после её добавления
         const reviewForm = document.getElementById('review-form');
         if (reviewForm) {
             reviewForm.addEventListener("submit", updateReview);
         }
+
+        const stars = document.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = star.getAttribute('data-value');
+                updateStars(selectedRating);
+                document.getElementById('rating-error').style.display = 'none'; // Скрываем сообщение об ошибке при выборе рейтинга
+            });
+        });
     }
 
-    // Функция для обновления отзыва
     function updateReview(event) {
         event.preventDefault();
+        const ratingError = document.getElementById('rating-error');
+        if (selectedRating === 0) {
+            ratingError.style.display = 'block';
+            return;
+        }
         const reviewId = event.target.getAttribute('data-review-id');
-        const rating = document.getElementById('rating').value;
         const reviewText = document.getElementById('review-text').value;
 
         const reviewData = {
-            rating: rating,
+            rating: selectedRating,
             review_text: reviewText
         };
 
@@ -203,8 +208,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-                fetchReviews(); // Обновить список отзывов после успешного обновления
-                window.location.href = `/book/${bookId}/`;  // Перенаправить обратно на страницу книги
+                fetchReviews();
+                window.location.href = `/book/${bookId}/`;
             } else {
                 console.error('Ошибка при обновлении отзыва:', data);
             }
@@ -214,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Функция для удаления отзыва
     function deleteReview(reviewId) {
         if (window.confirm("Вы уверены, что хотите удалить этот отзыв?")) {
             fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
@@ -224,12 +228,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Функция для добавления книги в список
     function addToReadingList(event) {
         const status = event.target.getAttribute('data-status');
-
         const url = `/api/reading_list/${username}/`;
-
         const data = {
             book: bookId,
             status: status
@@ -249,7 +250,19 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Загрузка данных о книге и отзывах при загрузке страницы
+    function updateStars(rating) {
+        const stars = document.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.classList.remove('selected');
+            if (star.getAttribute('data-value') <= rating) {
+                star.classList.add('selected');
+                star.textContent = '★';
+            } else {
+                star.textContent = '☆';
+            }
+        });
+    }
+
     fetchBookDetails();
     fetchReviews();
 
@@ -258,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-// Функция для получения CSRF токена из cookies
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {

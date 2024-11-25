@@ -6,33 +6,34 @@
 {% endblock %}
 
 {% block content %}
-<h1 id="book-title">Загрузка...</h1>
-<p><strong>Автор:</strong> <span id="book-author">Загрузка...</span></p>
-<p><strong>Описание:</strong> <span id="book-description">Загрузка...</span></p>
-<p><strong>Год издания:</strong> <span id="book-year">Загрузка...</span></p>
+<div class="content-wrapper">
+    <div class="book-detail-page">
+        <div class="book-detail-container">
+            <h1 id="book-title" class="book-title">Загрузка...</h1>
+            <p class="book-info"><strong>Автор:</strong> <span id="book-author">Загрузка...</span></p>
+            <p class="book-info"><strong>Описание:</strong> <span id="book-description">Загрузка...</span></p>
 
-{% if user.is_authenticated %}
-    <div id="reading-list-buttons" data-username="{{ user.username }}">
-        <h3>Добавить в список</h3>
-        <button id="add-to-wishlist" data-status="planned">Добавить в список желаемого</button>
-        <button id="add-to-reading" data-status="currently_reading">Добавить в список читаемого</button>
-        <button id="add-to-completed" data-status="completed">Добавить в список прочитанного</button>
+            {% if user.is_authenticated %}
+                <div id="reading-list-buttons" data-username="{{ user.username }}" class="reading-list-buttons">
+                    <h3>Добавить в список</h3>
+                    <button id="add-to-wishlist" data-status="planned" class="btn">Добавить в список желаемого</button>
+                    <button id="add-to-reading" data-status="currently_reading" class="btn">Добавить в список читаемого</button>
+                    <button id="add-to-completed" data-status="completed" class="btn">Добавить в список прочитанного</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="reviews-section">
+            <h3>Отзывы</h3>
+            <div id="user-review-header" class="user-review-header">
+                <!-- Отзыв пользователя или форма добавления отзыва будет динамически вставлена сюда -->
+            </div>
+            <ul id="reviews-list" class="reviews-list">
+                <!-- Отзывы будут динамически добавляться сюда -->
+            </ul>
+        </div>
     </div>
-{% endif %}
-
-<div class="reviews-section">
-    <!-- Хедер с отзывом пользователя или формой для добавления -->
-    <div id="user-review-header">
-        <!-- Отзыв пользователя или форма добавления отзыва будет динамически вставлена сюда -->
-    </div>
-
-    <!-- Список всех отзывов -->
-    <ul id="reviews-list">
-        <!-- Отзывы будут динамически добавляться сюда -->
-    </ul>
 </div>
 
-
 <script src="{% static 'js/book_detail.js' %}"></script>
-
 {% endblock %}
