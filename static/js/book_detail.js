@@ -18,6 +18,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error("Ошибка при загрузке данных о книге:", error);
             });
     }
+    function generateStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                stars += '<span class="star filled">★</span>';
+            } else {
+                stars += '<span class="star">☆</span>';
+            }
+        }
+        return `<div class="review-stars">${stars}</div>`;
+    }
 
     function fetchReviews() {
         fetch(`/api/book/${bookId}/reviews/`)
@@ -31,9 +42,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     userReviewFound = true;
                     userReviewHeader.innerHTML = `
                         <div class="user-review">
-                            <strong>${userReview.user}</strong> - ${userReview.rating}⭐
+                            <strong>${userReview.user}</strong> - ${generateStars(userReview.rating)}
+                            <br><br>
                             <p>${userReview.review_text}</p>
-                            <small>Дата: ${new Date(userReview.review_date).toLocaleDateString()}</small>
+                            <br>
+                            <small>Дата: ${new Date(userReview.review_date).toLocaleDateString()}</small><br>
                             <button class="edit-review btn" data-id="${userReview.id}">Редактировать</button>
                             <button class="delete-review btn" data-id="${userReview.id}">Удалить</button>
                         </div>
@@ -63,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (review.user !== username) {
                         const reviewItem = document.createElement('li');
                         reviewItem.innerHTML = `
-                            <strong>${review.user}</strong> - ${review.rating}⭐
-                            <p>${review.review_text}</p>
+                            <strong><a href="/users/profile/${review.user}/" class="username-link">${review.user}</a></strong></strong>  ${generateStars(review.rating)}
+                            <br><br><p>${review.review_text}</p><br>
                             <small>Дата: ${new Date(review.review_date).toLocaleDateString()}</small>
                         `;
                         reviewsList.appendChild(reviewItem);
@@ -145,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function editReview(reviewId) {
         const reviewElement = document.querySelector(`[data-id="${reviewId}"]`).parentElement;
         const reviewText = reviewElement.querySelector('p').textContent;
-        const rating = reviewElement.querySelector('strong').textContent[0];
+        const rating = reviewElement.querySelector('strong').nextSibling.textContent.split('-')[1].trim();
 
         userReviewHeader.innerHTML = `
             <h3>Редактировать отзыв</h3>
@@ -220,12 +233,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function deleteReview(reviewId) {
-        if (window.confirm("Вы уверены, что хотите удалить этот отзыв?")) {
-            fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
-                method: 'DELETE',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-            }).then(() => fetchReviews());
-        }
+        fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        }).then(() => fetchReviews());
     }
 
     function addToReadingList(event) {

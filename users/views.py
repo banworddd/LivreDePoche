@@ -19,6 +19,9 @@ def user_profile(request, username):
         'is_owner': is_owner
     })
 
+def users_list(request):
+    return render(request, 'users/users.html')
+
 def user_logout(request):
     logout(request)
     return redirect('index')

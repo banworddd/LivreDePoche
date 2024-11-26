@@ -817,7 +817,6 @@ main {
 /* Карточка автора */
 .author-card {
     background-color: #878787; /* Цвет как у карточек книг */
-    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
@@ -1080,8 +1079,7 @@ main {
 }
 
 .btn:hover {
-    transform: scale(1.1);
-    background-color: var(--button-hover-color);
+    transform: scale(1.05);
 }
 
 /* Блок отзывов */
@@ -1106,9 +1104,8 @@ main {
 .reviews-list li {
     margin-bottom: 15px;
     padding: 10px;
-    border: 1px solid var(--border-color);
     border-radius: 5px;
-    background-color: var(--secondary-bg-color);
+    background-color: #888888;
     color: white;
 }
 
@@ -1170,7 +1167,7 @@ main {
 
 /* Стили для сообщения об ошибке */
 .error-message {
-    color: red;
+    color: #ffffff;
     font-size: 14px;
     margin-top: 10px;
 }
@@ -1180,6 +1177,8 @@ main {
     color: white;
     text-decoration: none;
     transition: transform 0.3s ease;
+    display: inline-block;
+
 }
 
 .username-link:hover {
@@ -1190,3 +1189,85 @@ main {
 .review-buttons {
     margin-top: 10px;
 }
+
+/* Стили для звезд в отзывах */
+.review-stars {
+    display: inline-flex;
+    margin-left: 5px;
+}
+
+.review-stars .star {
+    font-size: 20px;
+    color: #ccc;
+    margin: 0 2px;
+}
+
+.review-stars .star.filled {
+    color: #ffd700;
+}
+/* Стили для ссылки на пользователя */
+.username-link {
+    color: white;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.username-link:hover {
+    transform: scale(1.1);
+}
+/* Стили для списка пользователей */
+.user-list-container {
+    background-color: var(--main-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+.user-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-list-item {
+    background-color: #888888;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.user-list-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.user-list-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #b9b9b9;
+}
+
+.user-list-details {
+    flex-grow: 1;
+}
+
+.user-list-username {
+    margin: 0;
+    font-size: 18px;
+}
+
+.user-list-bio {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #ccc;
+}
+

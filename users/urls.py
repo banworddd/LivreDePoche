@@ -11,6 +11,7 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),  # Маршрут для логина
     path('logout/', views.user_logout, name='logout'),  # Маршрут для выхода
     path('profile/<str:username>/', views.user_profile, name='profile'),
+    path('', views.users_list, name=''),
 
 ]
 if settings.DEBUG:

@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="user-list-container">
+        <h1>Список пользователей</h1>
+        <input type="text" id="search-input" placeholder="Поиск по нику..." class="search-input">
+        <ul id="user-list" class="user-list">
+            <!-- Пользователи будут вставлены сюда -->
+        </ul>
+    </div>
+</div>
+
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}

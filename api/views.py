@@ -5,14 +5,14 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .permissions import IsAuthenticatedOrReadOnly
-from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer, UserReviewSerializer
+from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer, UserReviewSerializer, UserListSerializer
 from users.models import CustomUser, ReadingList, BookReview
 from books.models import Book
 
@@ -227,6 +227,10 @@ class BookListView(APIView):
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
 
+class UserListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserListSerializer
+
 
 
 def send_welcome_email(user):
@@ -236,3 +240,5 @@ def send_welcome_email(user):
     recipient_list = [user.email]
 
     send_mail(subject, message, email_from, recipient_list)
+
+

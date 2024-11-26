@@ -15,10 +15,11 @@
 
             {% if user.is_authenticated %}
                 <div id="reading-list-buttons" data-username="{{ user.username }}" class="reading-list-buttons">
+                    <br>
                     <h3>Добавить в список</h3>
-                    <button id="add-to-wishlist" data-status="planned" class="btn">Добавить в список желаемого</button>
-                    <button id="add-to-reading" data-status="currently_reading" class="btn">Добавить в список читаемого</button>
-                    <button id="add-to-completed" data-status="completed" class="btn">Добавить в список прочитанного</button>
+                    <button id="add-to-wishlist" data-status="planned" class="btn">Желаемого</button>
+                    <button id="add-to-reading" data-status="currently_reading" class="btn">Читаемого</button>
+                    <button id="add-to-completed" data-status="completed" class="btn">Прочитанного</button>
                 </div>
             {% endif %}
         </div>

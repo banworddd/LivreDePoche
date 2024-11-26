@@ -122,3 +122,8 @@ class UserReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookReview
         fields = ['id', 'user', 'book_title', 'rating', 'review_text', 'review_date','book_id']  # Поля, которые должны быть включены в сериализатор
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'bio', 'avatar']
