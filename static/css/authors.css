@@ -1,0 +1,62 @@
+/* Контейнер для списка авторов */
+#author-list-container {
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1000px; /* Ограничиваем ширину */
+    background-color: #b8b8b8; /* Цвет как у страницы книг */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок страницы */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white; /* Белый цвет заголовка */
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень заголовка */
+}
+
+/* Список авторов */
+.author-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Карточка автора */
+.author-card {
+    background-color: #878787; /* Цвет как у карточек книг */
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Эффект наведения на карточку */
+.author-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Имя автора */
+.author-name a {
+    text-decoration: none;
+    color: white; /* Белый цвет текста */
+    font-size: 22px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* Эффект наведения на имя автора */
+.author-name a:hover {
+    transform: scale(1.1);
+}
+
+/* Дополнительная информация об авторе */
+.author-info {
+    font-size: 16px;
+    color: white;
+    margin: 10px 0;
+}

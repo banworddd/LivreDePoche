@@ -1,18 +1,25 @@
 {% extends 'layout.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/author_detail.css' %}">
+{% endblock %}
 
 {% block title %}{{ author.name }}{% endblock %}
 
 {% block content %}
-    <!-- Заголовок страницы с именем автора -->
-    <h1 style="text-align: center;">{{ author.name }}</h1>
+    <div class="author-page-container">
+        <!-- Заголовок страницы с именем автора -->
+        <h1 class="author-title">{{ author.name }}</h1>
 
-    <!-- Информация о годах жизни автора -->
-    <p style="text-align: center;"><strong>Годы жизни:</strong>
-        {{ author.date_of_birth }} - {{ author.date_of_death }}
-    </p>
+        <!-- Информация о годах жизни автора -->
+        <p class="author-years"><strong>Годы жизни:</strong>
+            {{ author.date_of_birth }} - {{ author.date_of_death }}
+        </p>
 
-    <!-- Биография автора -->
-    <div style="margin: 0 auto; width: 80%; text-align: justify;">
-        <p><strong>Биография:</strong> {{ author.bio }}</p>
+        <!-- Биография автора -->
+        <div class="bio-container">
+            <p><strong>Биография:</strong> {{ author.bio }}</p>
+        </div>
     </div>
 {% endblock %}

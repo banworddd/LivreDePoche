@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block title %}Список авторов{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/authors.css' %}">
+{% endblock %}
 
 {% block content %}
 <div id="author-list-container">

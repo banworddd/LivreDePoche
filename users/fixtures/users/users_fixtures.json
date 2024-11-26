@@ -1,0 +1,262 @@
+[
+    {
+        "model": "users.customuser",
+        "pk": 1,
+        "fields": {
+            "username": "user1",
+            "avatar": "avatars/user1.png",
+            "bio": "Привет, я user1!",
+            "email": "user1@example.com",
+            "password": "pbkdf2_sha256$30000$somesalt$somehash",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-10-01T12:00:00Z",
+            "first_name": "",
+            "last_name": ""
+        }
+    },
+    {
+        "model": "users.customuser",
+        "pk": 2,
+        "fields": {
+            "username": "user2",
+            "avatar": "avatars/user2.png",
+            "bio": "Привет, я user2!",
+            "email": "user2@example.com",
+            "password": "pbkdf2_sha256$30000$somesalt$somehash",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-10-02T12:00:00Z",
+            "first_name": "",
+            "last_name": ""
+        }
+    },
+    {
+        "model": "users.customuser",
+        "pk": 3,
+        "fields": {
+            "username": "user3",
+            "avatar": "avatars/user3.png",
+            "bio": "Привет, я user3!",
+            "email": "user3@example.com",
+            "password": "pbkdf2_sha256$30000$somesalt$somehash",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-10-03T12:00:00Z",
+            "first_name": "",
+            "last_name": ""
+        }
+    },
+    {
+        "model": "users.customuser",
+        "pk": 4,
+        "fields": {
+            "username": "user4",
+            "avatar": "avatars/user4.png",
+            "bio": "Привет, я user4!",
+            "email": "user4@example.com",
+            "password": "pbkdf2_sha256$30000$somesalt$somehash",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-10-04T12:00:00Z",
+            "first_name": "",
+            "last_name": ""
+        }
+    },
+    {
+        "model": "users.customuser",
+        "pk": 5,
+        "fields": {
+            "username": "user5",
+            "avatar": "avatars/user5.png",
+            "bio": "Привет, я user5!",
+            "email": "user5@example.com",
+            "password": "pbkdf2_sha256$30000$somesalt$somehash",
+            "last_login": null,
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-10-05T12:00:00Z",
+            "first_name": "",
+            "last_name": ""
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "book": 1,
+            "status": "planned",
+            "read_date": null
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "book": 2,
+            "status": "currently_reading",
+            "read_date": null
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 3,
+        "fields": {
+            "user": 1,
+            "book": 3,
+            "status": "completed",
+            "read_date": "2023-09-01"
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 4,
+        "fields": {
+            "user": 2,
+            "book": 1,
+            "status": "planned",
+            "read_date": null
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 5,
+        "fields": {
+            "user": 2,
+            "book": 4,
+            "status": "currently_reading",
+            "read_date": null
+        }
+    },
+    {
+        "model": "users.readinglist",
+        "pk": 6,
+        "fields": {
+            "user": 2,
+            "book": 5,
+            "status": "completed",
+            "read_date": "2023-09-02"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "book": 1,
+            "rating": 4,
+            "review_text": "Отличная книга! Рекомендую всем.",
+            "review_date": "2023-09-01"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "book": 2,
+            "rating": 5,
+            "review_text": "Просто потрясающе! Обязательно прочитайте.",
+            "review_date": "2023-09-02"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 3,
+        "fields": {
+            "user": 2,
+            "book": 1,
+            "rating": 3,
+            "review_text": "Неплохо, но могло быть и лучше.",
+            "review_date": "2023-09-03"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 4,
+        "fields": {
+            "user": 2,
+            "book": 4,
+            "rating": 4,
+            "review_text": "Интересная книга с хорошим сюжетом.",
+            "review_date": "2023-09-04"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 5,
+        "fields": {
+            "user": 3,
+            "book": 3,
+            "rating": 5,
+            "review_text": "Одна из лучших книг, которые я читал.",
+            "review_date": "2023-09-05"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 6,
+        "fields": {
+            "user": 3,
+            "book": 5,
+            "rating": 4,
+            "review_text": "Очень хорошая книга, рекомендую.",
+            "review_date": "2023-09-06"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 7,
+        "fields": {
+            "user": 4,
+            "book": 1,
+            "rating": 3,
+            "review_text": "Неплохая книга, но не более того.",
+            "review_date": "2023-09-07"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 8,
+        "fields": {
+            "user": 4,
+            "book": 2,
+            "rating": 4,
+            "review_text": "Хорошая книга с интересным сюжетом.",
+            "review_date": "2023-09-08"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 9,
+        "fields": {
+            "user": 5,
+            "book": 4,
+            "rating": 5,
+            "review_text": "Потрясающая книга! Обязательно прочитайте.",
+            "review_date": "2023-09-09"
+        }
+    },
+    {
+        "model": "users.bookreview",
+        "pk": 10,
+        "fields": {
+            "user": 5,
+            "book": 5,
+            "rating": 4,
+            "review_text": "Очень хорошая книга, рекомендую.",
+            "review_date": "2023-09-10"
+        }
+    }
+]

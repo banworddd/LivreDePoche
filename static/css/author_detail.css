@@ -1,0 +1,48 @@
+/* Контейнер для страницы */
+.author-page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--main-bg-color);
+    padding: 20px;
+    width: 100%;
+    max-width: 800px; /* Ограничиваем максимальную ширину */
+    margin: 20px auto; /* Центрируем контейнер по горизонтали */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок страницы */
+.author-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Информация о годах жизни автора */
+.author-years {
+    text-align: center;
+    font-size: 18px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Биография автора */
+.bio-container {
+    width: 80%;
+    text-align: justify;
+    background-color: #888888;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bio-container p {
+    font-size: 16px;
+    color: white;
+    margin: 10px 0;
+}

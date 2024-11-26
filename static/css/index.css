@@ -1,0 +1,67 @@
+/* Сообщения */
+#message {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--text-color);
+}
+
+/* Контейнер приветственного блока */
+#welcome-container {
+    background-color: #b8b8b8;
+    padding: 40px;
+    margin: 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Центрируем текст */
+    max-width: 800px; /* Ограничиваем ширину */
+    color: white;
+}
+
+/* Заголовок приветствия */
+.welcome-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Текст приветствия */
+.welcome-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Список особенностей */
+.features-list {
+    list-style-type: none; /* Убираем стандартные маркеры списка */
+    padding: 0;
+    margin: 20px 0;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.features-list li {
+    font-size: 16px;
+    margin: 10px 0;
+    text-align: left; /* Выравниваем текст списка по левому краю */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Выделяем текст списка и добавляем иконки */
+.features-list li::before {
+    content: '✔️';
+    margin-right: 10px;
+    color: var(--main-bg-color);
+    font-size: 18px;
+}
+
+/* Призыв к действию */
+.welcome-call-to-action {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-top: 20px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

@@ -1,35 +1,26 @@
 {% extends 'layout.html' %}
 {% load static %}
 
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/books.css' %}">
+{% endblock %}
+
 {% block title %}Список книг{% endblock %}
 
 {% block content %}
 <div class="books-page-container">
-    <!-- Блок с заголовком, фильтрами и поиском -->
+    <!-- Блок с заголовком и поиском -->
     <div class="search-filters-container">
         <h1 class="page-title">Список книг</h1>
         <div class="search-filters">
             <!-- Поле поиска -->
             <input id="search-input" type="text" class="form-control search-input" placeholder="Введите название, автора или жанр" />
-            <button id="search-button" class="btn btn-light">
+            <!-- Кнопка поиска -->
+            <button id="apply-filters" class="btn btn-light">
                 <i class="bi bi-search"></i> <!-- Иконка поиска -->
             </button>
         </div>
-
-        <!-- Фильтры -->
-        <div class="filters">
-            <select id="author-filter" class="form-select">
-                <option value="">Все авторы</option>
-            </select>
-
-            <select id="genre-filter" class="form-select">
-                <option value="">Все жанры</option>
-            </select>
-
-            <button id="apply-filters" class="btn btn-primary">Применить фильтры</button>
-        </div>
     </div>
-
     <!-- Блок с книгами -->
     <div class="book-list-container">
         <ul id="book-list" class="book-list">

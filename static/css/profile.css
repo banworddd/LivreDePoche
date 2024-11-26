@@ -1,0 +1,374 @@
+/* Основной контейнер профиля */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 75%; /* Фиксированная ширина 65% от ширины страницы */
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+/* Верхний блок с информацией пользователя (сделаем его поуже) */
+.user-info {
+    background-color: var(--main-bg-color); /* Цвет, гармонирующий с хедером */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    color: white; /* Текст выделяется на темном фоне */
+    width: 70%; /* Ширина блока с аватаром, биографией и ником - поуже */
+    margin: 0 auto; /* Выравнивание по центру */
+}
+
+.user-info h3, .user-info p {
+    margin-bottom: 10px;
+}
+
+/* Стили для биографии */
+.user-info .user-bio {
+    background-color: rgb(135, 135, 135); /* Легкий контраст */
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* Когда textarea в режиме редактирования (при открытии формы) */
+#bio-form {
+    display: none; /* Скрываем форму по умолчанию */
+}
+
+/* Стандартный стиль textarea (без изменений при редактировании) */
+#bio {
+    background-color: rgb(135, 135, 135);
+    color: white;
+    border: none; /* Без границ */
+    resize: none; /* Отключаем изменение размера */
+    min-height: 40px;  /* Минимальная высота */
+    max-height: 40px;  /* Максимальная высота */
+    font-size: 1rem;
+    padding: 5px;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box; /* Чтобы паддинг не влиял на ширину */
+}
+
+/* Для кнопки редактирования */
+#edit-bio {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+#edit-bio:hover i {
+    color: #bababa; /* Цвет иконки при наведении */
+    transform: scale(1.2); /* Увеличиваем иконку на 20% */
+}
+
+/* При нажатии на карандаш (включение режима редактирования) */
+#bio:focus {
+    outline: none; /* Убираем стандартную обводку при фокусе */
+    background-color: rgb(134, 134, 134); /* Увеличиваем контраст для активного состояния */
+    min-height: 40px; /* Фиксированная минимальная высота */
+    max-height: 40px; /* Фиксированная максимальная высота */
+    height: auto; /* Высота не будет меняться */
+}
+
+/* Чтобы textarea не изменял размеры при редактировании */
+#bio:focus {
+    min-height: 40px; /* Фиксированная минимальная высота */
+    height: auto; /* Высота будет автоматически подстраиваться, но не изменит начальную высоту */
+}
+
+/* Стили для секции отзывов и списков (горизонтальное расположение) */
+.lower-blocks {
+    display: flex; /* Это устанавливает горизонтальное расположение блоков */
+    gap: 20px; /* Добавляем расстояние между блоками */
+    flex-wrap: wrap; /* Позволяет блокам переноситься на новую строку на меньших экранах */
+    justify-content: space-between; /* Размещает блоки с максимальным расстоянием между ними */
+    width: 100%; /* Нижние блоки будут иметь такую же ширину, как основной блок контента */
+}
+
+/* Настройки для отдельных блоков */
+.card {
+    flex: 1 1 45%; /* Изменил с 30% на 45% для лучшего использования пространства */
+    background-color: var(--main-bg-color);
+    color: #bfbfbf;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: rgb(133, 133, 133);
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+}
+
+.card-body h6 {
+    margin-bottom: 10px;
+    color: #f0f0f0;
+}
+
+/* Элементы списка */
+.list-group {
+    list-style: none;
+    padding: 0;
+
+}
+
+/* Аватар */
+.avatar-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 10px;
+    border: 3px solid white;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-container:hover .avatar-overlay {
+    display: flex;
+}
+
+/* Затемнение аватара при наведении */
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#reviews {
+    color: white; /* Устанавливаем белый цвет текста для всех элементов внутри блока */
+}
+
+/* Хедер блока с отзывами */
+#reviews .card-header {
+    background-color: rgb(135, 135, 135); /* Темнее, чем общий фон блока */
+    color: white; /* Белый цвет текста для заголовка */
+}
+
+/* Сделаем это правило более специфичным */
+#reviews .list-group .review-item {
+    background-color: rgb(134, 134, 134) !important; /* Фон каждого отзыва */
+    color: white; /* Белый цвет текста */
+}
+
+/* Убираем подчеркивание и изменение цвета для ссылок в блоке с отзывами */
+#reviews a {
+    text-decoration: none;  /* Убираем подчеркивание */
+    color: inherit;         /* Устанавливаем цвет текста как у родительского элемента (белый) */
+    transition: transform 0.3s ease; /* Плавный переход */
+    display: inline-block;  /* Устанавливаем ссылку как inline-block для поддержки эффекта увеличения */
+}
+
+/* Применяем увеличивающийся эффект только к ссылкам внутри блока отзывов */
+#reviews .review-item a:hover {
+    transform: scale(1.05); /* Увеличение ссылки при наведении */
+}
+
+/* Применяем стиль для звезд (рейтинг) */
+.review-item .rating {
+    font-size: 1.2rem;
+    color: gold; /* Цвет для звезд */
+}
+
+/* Добавляем скругленные углы и отступы между блоками каждого отзыва */
+#reviews .review-item {
+    background-color: rgba(255, 255, 255, 0.15); /* Фон каждого отзыва такой же, как и у хедера */
+    color: white; /* Белый цвет текста для каждого отзыва */
+    border-radius: 10px; /* Скругленные углы */
+    margin-bottom: 10px; /* Маленькие отступы между отзывами */
+    padding: 10px; /* Отступы внутри блока */
+}
+
+/* Пример дополнительного стиля для других элементов внутри отзывов */
+#reviews .card-body h6 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Основной контейнер со списками */
+#reading-list .card-body {
+    display: block; /* Меняем на блоковое расположение, чтобы элементы шли друг под другом */
+    gap: 20px;
+}
+
+/* Блок для каждого списка книг */
+.reading-list-block {
+    background-color: #868686;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Блоки занимают всю ширину */
+    height: auto !important; /* Высота блока зависит от содержимого */
+    box-sizing: border-box;
+}
+
+/* Заголовки секций */
+.reading-list-block h6 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 15px; /* Увеличиваем отступ между заголовками */
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Кнопка стрелочки */
+.toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.toggle-btn:hover {
+    transform: scale(1.2); /* Увеличение кнопки при наведении */
+}
+
+/* Скрытие/отображение списка */
+.reading-list {
+    display: none; /* Скрываем списки по умолчанию */
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Показ списка при клике */
+.reading-list.active {
+    display: block;
+}
+
+/* Карточка книги */
+.book-card {
+    background-color: #b8b8b8;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Добавляем для позиционирования кнопки */
+    max-width: 100%; /* Убедитесь, что карточка не выходит за пределы родителя */
+    box-sizing: border-box;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
+}
+
+/* Эффект при наведении */
+.book-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Заголовок книги */
+.book-card h6 {
+    font-size: 0.95rem;
+    color: var(--main-bg-color);
+    margin-bottom: 5px;
+    display: flex; /* Делаем заголовок гибким */
+    justify-content: space-between; /* Располагаем название и кнопку по краям */
+    align-items: center;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
+}
+
+/* Изображение книги (если используется) */
+.book-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Текст внутри карточки книги */
+.book-card p {
+    font-size: 0.85rem;
+    color: white;
+    margin: 0;
+}
+
+/* Пустое состояние (например, Загрузка...) */
+.reading-list .book-card {
+    background-color: var(--main-bg-color);
+    color: #fff;
+    text-align: center;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-bottom: 10px; /* Добавляем небольшой отступ между карточками книг */
+}
+
+/* Для пустых карточек */
+.reading-list .book-card:empty {
+    font-size: 1rem;
+    color: #888;
+}
+
+/* Ссылки */
+.reading-list a {
+    text-decoration: none;
+    color: white; /* Белый текст для ссылок */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: bold; /* Жирный шрифт */
+    font-style: normal; /* Убираем наклон */
+}
+
+/* Эффект увеличения для ссылок при наведении */
+.reading-list a:hover {
+    transform: scale(1.1);
+}
+
+/* Для кнопки удаления */
+.delete-button {
+    background: transparent;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* Эффект при наведении на кнопку удаления */
+.delete-button:hover {
+    color: darkred;
+}
+
+/* Размещение кнопки удаления справа от названия книги */
+.book-card .delete-button {
+    position: absolute; /* Абсолютное позиционирование для кнопки */
+    right: 10px; /* Отступ от правого края */
+    top: 50%; /* Центрируем по вертикали относительно заголовка */
+    transform: translateY(-50%); /* Подправляем вертикальное расположение */
+    z-index: 1; /* Убедитесь, что кнопка находится поверх других элементов */
+}

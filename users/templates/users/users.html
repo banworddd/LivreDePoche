@@ -3,10 +3,15 @@
 
 {% block title %}Пользователи{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/users.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="content-wrapper">
     <div class="user-list-container">
         <h1>Список пользователей</h1>
+        <br>
         <input type="text" id="search-input" placeholder="Поиск по нику..." class="search-input">
         <ul id="user-list" class="user-list">
             <!-- Пользователи будут вставлены сюда -->

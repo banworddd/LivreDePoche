@@ -1,0 +1,66 @@
+/* Контейнер для формы регистрации */
+#registration-form-container {
+    background-color: var(--header-bg-color); /* Цвет фона как у хедера */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: absolute; /* Используем absolute для позиционирования */
+    top: 50%; /* Центрируем по вертикали */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translate(-50%, -50%); /* Смещаем на 50% в обеих осях для точного выравнивания */
+}
+
+/* Заголовок страницы "Регистрация" */
+.registration-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+    margin-bottom: 20px; /* Отступ снизу */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для заголовка */
+}
+
+/* Стили для инпутов */
+#registration-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: white; /* Белый цвет для текста */
+}
+
+#registration-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+#registration-form input:focus {
+    border-color: var(--input-focus-color);
+    outline: none;
+}
+
+/* Стили для кнопки */
+#registration-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #868686;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+#registration-form button:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+}

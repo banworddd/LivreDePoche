@@ -1,0 +1,93 @@
+.username-link {
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.username-link:hover {
+    transform: scale(1.1);
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center; /* Центрируем контейнер по горизонтали */
+    align-items: flex-start; /* Выравнивание по вертикали */
+    padding: 20px; /* Отступы для контейнера */
+    width: 65%;
+
+}
+
+.user-list-container {
+    background-color: #b9b9b9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: white;
+    width: 100%; /* Увеличиваем ширину */
+    max-width: 800px; /* Ограничиваем максимальную ширину */
+    margin: 0 auto; /* Центрируем контейнер по горизонтали */
+}
+
+.user-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-list-item {
+    background-color: #888888;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.user-list-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.user-list-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #b9b9b9;
+}
+
+.user-list-details {
+    flex-grow: 1;
+}
+
+.user-list-username {
+    margin: 0;
+    font-size: 18px;
+}
+
+.user-list-bio {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* Стили для поля ввода поиска */
+.search-input {
+    width: 60%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none; /* Убираем обводку */
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none; /* Убираем обводку при фокусе */
+    background-color: #888888; /* Цвет фона */
+    color: white; /* Цвет текста */
+}
+
+.search-input::placeholder {
+    color: #ccc; /* Цвет текста плейсхолдера */
+}

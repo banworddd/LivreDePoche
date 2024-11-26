@@ -3,6 +3,11 @@
 
 {% block title %}Профиль: {{ profile_user.username }}{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+
 {% block content %}
 <div class="profile-container" data-username="{{ profile_user.username }}" data-csrf="{{ csrf_token }}" data-is-owner="{{ is_owner }}">
     <!-- Верхний блок: информация о пользователе -->

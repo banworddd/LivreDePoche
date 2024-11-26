@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const API_URL = "/api/books/";  // Относительный путь
-    const authorFilter = document.getElementById("author-filter");
-    const genreFilter = document.getElementById("genre-filter");
     const searchInput = document.getElementById("search-input");
     const applyFiltersButton = document.getElementById("apply-filters");
-    const searchButton = document.getElementById("search-button");
     const bookList = document.getElementById("book-list");
 
     // Функция для загрузки данных
@@ -45,42 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // Функция для загрузки фильтров
-    const loadFilters = () => {
-        fetch(API_URL)
-            .then(response => response.json())
-            .then(data => {
-                const authors = new Set();
-                const genres = new Set();
-
-                data.forEach(book => {
-                    book.authors.forEach(author => authors.add(author.name));
-                    book.genre.forEach(genre => genres.add(genre.name));
-                });
-
-                authors.forEach(author => {
-                    const option = document.createElement("option");
-                    option.value = author;
-                    option.textContent = author;
-                    authorFilter.appendChild(option);
-                });
-
-                genres.forEach(genre => {
-                    const option = document.createElement("option");
-                    option.value = genre;
-                    option.textContent = genre;
-                    genreFilter.appendChild(option);
-                });
-            })
-            .catch(error => console.error("Ошибка при загрузке фильтров:", error));
-    };
-
-   // Убедитесь, что параметры пустого фильтра не отправляются
+    // Обработчик события для кнопки поиска
     applyFiltersButton.addEventListener("click", () => {
         const filters = {
-            author: authorFilter.value || undefined,  // Не передавать пустое значение
-            genre: genreFilter.value || undefined,    // Не передавать пустое значение
-            search: searchInput.value.trim() || undefined,  // Не передавать пустое значение
+            search: searchInput.value.trim() || undefined,  // Приводим строку поиска к нижнему регистру
         };
 
         // Отфильтровываем параметры
@@ -91,15 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loadBooks(nonEmptyFilters);
     });
 
-    // Событие на кнопку поиска
-    searchButton.addEventListener("click", () => {
-        const filters = {
-            search: searchInput.value.trim().toLowerCase(), // Приводим строку поиска к нижнему регистру
-        };
-        loadBooks(filters);
-    });
-
-    // Первоначальная загрузка данных
-    loadFilters();
+    // Первоначальная загрузка данных без фильтров
     loadBooks();
 });
