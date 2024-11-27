@@ -5,15 +5,15 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
-from rest_framework import status, generics
+from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .permissions import IsAuthenticatedOrReadOnly
-from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer, UserReviewSerializer, UserListSerializer
-from users.models import CustomUser, ReadingList, BookReview
+from .serializers import UserSerializer, LoginSerializer, ReadingListSerializer, BookSerializer, BookReviewSerializer, UserReviewSerializer, UserListSerializer, BookReviewMarkSerializer
+from users.models import CustomUser, ReadingList, BookReview, BookReviewMark
 from books.models import Book
 
 
@@ -230,6 +230,43 @@ class BookListView(APIView):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserListSerializer
+
+class BookReviewMarkAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        review_id = request.query_params.get('review')
+        if review_id:
+            marks = BookReviewMark.objects.filter(review_id=review_id)
+        else:
+            marks = BookReviewMark.objects.all()
+        serializer = BookReviewMarkSerializer(marks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = BookReviewMarkSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, review_id):
+        review = get_object_or_404(BookReview, id=review_id)
+        mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
+        data = request.data.copy()
+        serializer = BookReviewMarkSerializer(mark, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, review_id):
+        review = get_object_or_404(BookReview, id=review_id)
+        mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
+        mark.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

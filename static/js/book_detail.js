@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error("Ошибка при загрузке данных о книге:", error);
             });
     }
+
     function generateStars(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) {
@@ -73,15 +74,40 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
 
                 data.forEach(review => {
-                    if (review.user !== username) {
-                        const reviewItem = document.createElement('li');
-                        reviewItem.innerHTML = `
-                            <strong><a href="/users/profile/${review.user}/" class="username-link">${review.user}</a></strong></strong>  ${generateStars(review.rating)}
-                            <br><br><p>${review.review_text}</p><br>
-                            <small>Дата: ${new Date(review.review_date).toLocaleDateString()}</small>
-                        `;
-                        reviewsList.appendChild(reviewItem);
-                    }
+                    const reviewItem = document.createElement('li');
+                    reviewItem.innerHTML = `
+                        <strong><a href="/users/profile/${review.user}/" class="username-link">${review.user}</a></strong></strong>  ${generateStars(review.rating)}
+                        <br><br><p>${review.review_text}</p><br>
+                        <small>Дата: ${new Date(review.review_date).toLocaleDateString()}</small>
+                        <div class="like-dislike-buttons">
+                            <button class="like-button btn" data-review-id="${review.id}"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
+                            <button class="dislike-button btn" data-review-id="${review.id}"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
+                        </div>
+                    `;
+                    reviewsList.appendChild(reviewItem);
+
+                    // Fetch like and dislike counts for the review
+                    fetch(`/api/bookreviewmarks/?review=${review.id}`)
+                        .then(response => response.json())
+                        .then(marks => {
+                            const likeCount = marks.filter(mark => mark.mark === 'like').length;
+                            const dislikeCount = marks.filter(mark => mark.mark === 'dislike').length;
+                            reviewItem.querySelector('.like-count').textContent = likeCount;
+                            reviewItem.querySelector('.dislike-count').textContent = dislikeCount;
+
+                            // Check if the user has already marked this review
+                            const userMark = marks.find(mark => mark.user === username);
+                            if (userMark) {
+                                if (userMark.mark === 'like') {
+                                    reviewItem.querySelector('.like-button').classList.add('marked');
+                                } else if (userMark.mark === 'dislike') {
+                                    reviewItem.querySelector('.dislike-button').classList.add('marked');
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Ошибка при загрузке оценок:", error);
+                        });
                 });
 
                 const reviewForm = document.getElementById('review-form');
@@ -111,6 +137,26 @@ document.addEventListener("DOMContentLoaded", function() {
                         selectedRating = star.getAttribute('data-value');
                         updateStars(selectedRating);
                         document.getElementById('rating-error').style.display = 'none'; // Скрываем сообщение об ошибке при выборе рейтинга
+                    });
+                });
+
+                const likeButtons = document.querySelectorAll('.like-button');
+                likeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const reviewId = button.getAttribute('data-review-id');
+                        const likeButton = button;
+                        const dislikeButton = button.nextElementSibling;
+                        toggleMark(reviewId, 'like', likeButton, dislikeButton);
+                    });
+                });
+
+                const dislikeButtons = document.querySelectorAll('.dislike-button');
+                dislikeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const reviewId = button.getAttribute('data-review-id');
+                        const dislikeButton = button;
+                        const likeButton = button.previousElementSibling;
+                        toggleMark(reviewId, 'dislike', likeButton, dislikeButton);
                     });
                 });
             })
@@ -237,6 +283,123 @@ document.addEventListener("DOMContentLoaded", function() {
             method: 'DELETE',
             headers: { 'X-CSRFToken': getCookie('csrftoken') },
         }).then(() => fetchReviews());
+    }
+
+    function toggleMark(reviewId, markType, likeButton, dislikeButton) {
+        const url = `/api/bookreviewmarks/?review=${reviewId}&user=${username}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    // If a mark already exists, update it
+                    const markId = data[0].id;
+                    const updateUrl = `/api/bookreviewmarks/${reviewId}/update/`;
+                    const updateData = { mark: markType };
+
+                    if (data[0].mark === markType) {
+                        // If the same mark is clicked again, delete the mark
+                        fetch(`/api/bookreviewmarks/${reviewId}/delete/`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken'),
+                            },
+                        })
+                        .then(response => {
+                            if (response.status === 204) {
+                                likeButton.classList.remove('marked');
+                                dislikeButton.classList.remove('marked');
+                                updateMarkCounts(reviewId);
+                            } else {
+                                console.error('Ошибка при удалении оценки:', data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Ошибка при удалении оценки:", error);
+                        });
+                    } else {
+                        // If a different mark is clicked, update the mark
+                        fetch(updateUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken'),
+                            },
+                            body: JSON.stringify(updateData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.id) {
+                                likeButton.classList.remove('marked');
+                                dislikeButton.classList.remove('marked');
+                                if (markType === 'like') {
+                                    likeButton.classList.add('marked');
+                                } else if (markType === 'dislike') {
+                                    dislikeButton.classList.add('marked');
+                                }
+                                updateMarkCounts(reviewId);
+                            } else {
+                                console.error('Ошибка при обновлении оценки:', data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Ошибка при обновлении оценки:", error);
+                        });
+                    }
+                } else {
+                    // If no mark exists, create a new one
+                    const createData = {
+                        review: reviewId,
+                        mark: markType
+                    };
+
+                    fetch('/api/bookreviewmarks/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                        body: JSON.stringify(createData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.id) {
+                            likeButton.classList.remove('marked');
+                            dislikeButton.classList.remove('marked');
+                            if (markType === 'like') {
+                                likeButton.classList.add('marked');
+                            } else if (markType === 'dislike') {
+                                dislikeButton.classList.add('marked');
+                            }
+                            updateMarkCounts(reviewId);
+                        } else {
+                            console.error('Ошибка при добавлении оценки:', data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Ошибка при отправке оценки:", error);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при проверке существующей оценки:", error);
+            });
+    }
+
+    function updateMarkCounts(reviewId) {
+        fetch(`/api/bookreviewmarks/?review=${reviewId}`)
+            .then(response => response.json())
+            .then(marks => {
+                const likeCount = marks.filter(mark => mark.mark === 'like').length;
+                const dislikeCount = marks.filter(mark => mark.mark === 'dislike').length;
+                const reviewItem = document.querySelector(`[data-review-id="${reviewId}"]`).parentElement;
+                reviewItem.querySelector('.like-count').textContent = likeCount;
+                reviewItem.querySelector('.dislike-count').textContent = dislikeCount;
+            })
+            .catch(error => {
+                console.error("Ошибка при обновлении счетчиков:", error);
+            });
     }
 
     function addToReadingList(event) {

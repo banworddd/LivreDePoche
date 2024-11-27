@@ -182,3 +182,34 @@
 .username-link:hover {
     transform: scale(1.1);
 }
+
+/* Стили для иконок лайков и дизлайков */
+.like-dislike-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    margin-left: auto; /* Выравнивание по правому краю */
+}
+
+.like-button, .dislike-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px; /* Увеличиваем размер иконки */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.like-button:hover, .dislike-button:hover {
+    transform: scale(1.1);
+}
+
+/* Стиль для выделения кнопки, если оценка уже поставлена */
+.like-button.marked {
+    color: #689f38; /* Зеленый */
+}
+
+.dislike-button.marked {
+    color: #ef5350; /* Красный */
+}

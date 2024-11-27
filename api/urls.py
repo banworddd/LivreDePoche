@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from .views import UserRegistration, UserLogin, ProfileView, ReadingListView, BookView, BookReviewView, \
-    UserBookReviewsView, BookListView, UserListView
+    UserBookReviewsView, BookListView, UserListView, BookReviewMarkAPIView
 
 app_name = 'api'
 urlpatterns = [
@@ -18,6 +18,10 @@ urlpatterns = [
     path('user_reviews/<str:username>/', UserBookReviewsView.as_view(), name='user_reviews'),
     path('books/', BookListView.as_view(), name='book-list'),
     path('user_list/', UserListView.as_view(), name='user-list'),
+    path('bookreviewmarks/', BookReviewMarkAPIView.as_view(), name='bookreviewmark-list-create'),
+    path('bookreviewmarks/<int:book_id>/', BookReviewMarkAPIView.as_view(), name='bookreviewmark-list-by-book'),
+    path('bookreviewmarks/<int:review_id>/update/', BookReviewMarkAPIView.as_view(), name='bookreviewmark-update'),
+    path('bookreviewmarks/<int:review_id>/delete/', BookReviewMarkAPIView.as_view(), name='bookreviewmark-delete'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

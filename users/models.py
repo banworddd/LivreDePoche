@@ -57,3 +57,23 @@ class BookReview(models.Model):
 
     def __str__(self):
         return f'{self.user.username} says "{self.review_text}" on {self.review_date}'
+
+class BookReviewMark(models.Model):
+    LIKE = 'like'
+    DISLIKE = 'dislike'
+    MARK_CHOICES = [
+        (LIKE, 'Like'),
+        (DISLIKE, 'Dislike'),
+    ]
+
+    review = models.ForeignKey(BookReview, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    mark = models.CharField(max_length=7, choices=MARK_CHOICES)
+
+    class Meta:
+        unique_together = ('review', 'user')  # Уникальное ограничение для пользователя и обзора
+
+    def __str__(self):
+        return f'{self.user.username} {self.mark}s review {self.review.id}'
+
+
