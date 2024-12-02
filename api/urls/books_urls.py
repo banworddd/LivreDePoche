@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from api.views import  BookView, BookReviewView, BookListView, BookReviewMarkAPIView
+from api.views.books_views import  BookView, BookReviewView, BookListView, BookReviewMarkAPIView
 
 app_name = 'books'
 urlpatterns = [

@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from api.views import UserRegistration, UserLogin, ProfileView, ReadingListView, UserBookReviewsView, UserListView
+from api.views.users_views import UserRegistration, UserLogin, ProfileView, ReadingListView, UserBookReviewsView, UserListView
 
 app_name = 'users'
 
