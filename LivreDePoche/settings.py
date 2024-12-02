@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'books',
     'api',
     'rest_framework',
+    'drf_yasg',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

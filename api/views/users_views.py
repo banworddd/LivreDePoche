@@ -1,7 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
-from django.core.mail import send_mail
-from django.conf import settings
 from django.utils import timezone
 
 
@@ -11,23 +9,18 @@ from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from drf_yasg.utils import swagger_auto_schema
+
 from api.permissions import IsAuthenticatedOrReadOnly
 from api.serializers.users_serializers import UserSerializer, LoginSerializer, ReadingListSerializer,  UserReviewSerializer, UserListSerializer
 from users.models import CustomUser, ReadingList, BookReview
-
-
-def send_welcome_email(user):
-    subject = 'Добро пожаловать в наш сервис!'
-    message = f'Привет, {user.username}! Спасибо за регистрацию.'
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [user.email]
-
-    send_mail(subject, message, email_from, recipient_list)
+from api.utils import send_welcome_email
 
 
 class UserRegistration(APIView):
     renderer_classes = [JSONRenderer]
 
+    @swagger_auto_schema(operation_description='Создает пользователя в БД')
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         try:
@@ -46,6 +39,7 @@ class UserRegistration(APIView):
 class UserLogin(APIView):
     renderer_classes = [JSONRenderer]
 
+    @swagger_auto_schema(operation_description='Авторизирует пользователя с указанными данными')
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -67,14 +61,14 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]  # Используйте новый класс разрешений
     parser_classes = [MultiPartParser, FormParser]  # Поддержка загрузки файлов
 
+    @swagger_auto_schema(operation_description='Получает данные профиля пользователя')
     def get(self, request, username):
-        """Получает данные профиля пользователя."""
         user = get_object_or_404(CustomUser, username=username)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_description='Обновляет профиль пользователя.')
     def post(self, request, username):
-        """Обновляет профиль пользователя."""
         user = get_object_or_404(CustomUser, username=username)
 
         # Проверяем, является ли текущий пользователь владельцем профиля
@@ -93,12 +87,14 @@ class ProfileView(APIView):
 class ReadingListView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]  # Используйте новый класс разрешений
 
+    @swagger_auto_schema(operation_description='Получает списки чтения пользователя по username')
     def get(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
         reading_list = ReadingList.objects.filter(user=user)
         serializer = ReadingListSerializer(reading_list, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_description='Создает/правит записи в списках для чтения пользователя')
     def post(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
         book_id = request.data.get('book')
@@ -133,6 +129,7 @@ class ReadingListView(APIView):
         print("Serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Удаляет запись из списков пользователя')
     def delete(self, request, username, reading_list_id):
         try:
             print(f"Попытка удалить запись для пользователя {username} и записи с ID {reading_list_id}")
@@ -148,6 +145,7 @@ class ReadingListView(APIView):
 
 
 class UserBookReviewsView(APIView):
+    @swagger_auto_schema(operation_description='Получает отзывы пользователя по его username')
     def get(self, request, username):
         # Получаем все отзывы пользователя по его имени
         reviews = BookReview.objects.filter(user__username=username)

@@ -10,8 +10,11 @@ from api.serializers.books_serializers import  BookSerializer, BookReviewSeriali
 from users.models import  BookReview, BookReviewMark
 from books.models import Book
 
+from drf_yasg.utils import swagger_auto_schema
+
 
 class BookView(APIView):
+    @swagger_auto_schema(operation_description='Получает запись из модели Book')
     def get(self, request, book_id):
         book = get_object_or_404(Book, id=book_id)
         serializer = BookSerializer(book)
@@ -21,15 +24,14 @@ class BookView(APIView):
 class BookReviewView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    @swagger_auto_schema(operation_description='Получает список отзывов на книгу по ее id')
     def get(self, request, book_id):
-        """Получение списка отзывов на книгу."""
-        book = get_object_or_404(Book, id=book_id)
-        reviews = BookReview.objects.filter(book=book)
+        reviews = BookReview.objects.filter(book=book_id)
         serializer = BookReviewSerializer(reviews, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_description='Добавляет отзыв на книгу по ее id')
     def post(self, request, book_id):
-        """Добавление нового отзыва."""
         book = get_object_or_404(Book, id=book_id)
         serializer = BookReviewSerializer(data=request.data)
         if serializer.is_valid():
@@ -37,8 +39,8 @@ class BookReviewView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Редактирование отзыва на книгу по ее id и review id')
     def put(self, request, book_id, review_id):
-        """Редактирование отзыва пользователя на книгу."""
         review = get_object_or_404(BookReview, id=review_id, book_id=book_id, user=request.user)
         serializer = BookReviewSerializer(review, data=request.data, partial=True)
         if serializer.is_valid():
@@ -46,14 +48,16 @@ class BookReviewView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Удаление отзыва на книгу по ее id и review id')
     def delete(self, request, book_id, review_id):
-        """Удаление отзыва пользователя на книгу."""
         review = get_object_or_404(BookReview, id=review_id, book_id=book_id, user=request.user)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BookListView(APIView):
+
+    @swagger_auto_schema(operation_description='Получаем список книг из модели Books, с возможностью фильтрации ')
     def get(self, request):
         # Получаем параметры фильтрации из запроса
         author_name = request.GET.get('author', None)
@@ -91,6 +95,7 @@ class BookListView(APIView):
 class BookReviewMarkAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(operation_description='Получает список оценок на отзыв')
     def get(self, request):
         review_id = request.query_params.get('review')
         if review_id:
@@ -100,6 +105,7 @@ class BookReviewMarkAPIView(APIView):
         serializer = BookReviewMarkSerializer(marks, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_description='Добавляет оценку на отзыв по по id пользователя')
     def post(self, request):
         data = request.data.copy()
         data['user'] = request.user.id
@@ -109,6 +115,7 @@ class BookReviewMarkAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Меняет оценку на отзыв по по id пользователя')
     def put(self, request, review_id):
         review = get_object_or_404(BookReview, id=review_id)
         mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
@@ -119,6 +126,7 @@ class BookReviewMarkAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Удаляет оценку на отзыв по по id пользователя')
     def delete(self, request, review_id):
         review = get_object_or_404(BookReview, id=review_id)
         mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
