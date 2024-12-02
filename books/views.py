@@ -3,25 +3,25 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
 from books.models import Book, Author
-from users.models import (
-    ReadingList,
-    BookReview
-)
+from users.models import ReadingList, BookReview
 
 def books_view(request):
     """Отображает список книг."""
     books = Book.objects.all()
     return render(request, 'books/books.html', {'books': books})
 
-
 def book_detail_view(request, book_id):
-    book = Book.objects.get(id=book_id)
+    book = get_object_or_404(Book, id=book_id)
 
     # Получаем список отзывов для книги
     reviews = BookReview.objects.filter(book=book)
 
-    # Проверяем, оставил ли текущий пользователь отзыв
-    user_reviewed = reviews.filter(user=request.user).exists()
+    # Проверяем, аутентифицирован ли пользователь
+    if request.user.is_authenticated:
+        # Проверяем, оставил ли текущий пользователь отзыв
+        user_reviewed = reviews.filter(user=request.user).exists()
+    else:
+        user_reviewed = False
 
     # Передаем переменные в шаблон
     context = {
@@ -30,7 +30,6 @@ def book_detail_view(request, book_id):
         'user_reviewed': user_reviewed,
     }
     return render(request, 'books/book_detail.html', context)
-
 
 @login_required
 def add_review(request, book_id):
