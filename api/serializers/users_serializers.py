@@ -1,28 +1,7 @@
 from rest_framework import serializers
 
-from users.models import CustomUser,ReadingList, BookReview, BookReviewMark
-from books.models import Book, Author, Genre
-
-
-class AuthorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Author
-        fields = '__all__'
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = '__all__'
-
-
-class BookSerializer(serializers.ModelSerializer):
-    authors = AuthorSerializer(many=True, read_only=True)  # Вложенные данные авторов
-    genre = GenreSerializer(many=True, read_only=True)     # Вложенные данные жанров
-
-    class Meta:
-        model = Book
-        fields = '__all__'
+from users.models import CustomUser,ReadingList, BookReview
+from books.models import Book
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -108,35 +87,6 @@ class ReadingListSerializer(serializers.ModelSerializer):
 
         return data
 
-class BookReviewSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)  # Возвращает имя пользователя
-
-    class Meta:
-        model = BookReview
-        fields = ['id', 'user', 'rating', 'review_text', 'review_date']
-        read_only_fields = ['id', 'user', 'review_date']
-
-
-class BookReviewMarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BookReviewMark
-        fields = '__all__'
-
-    def validate(self, data):
-        review = data.get('review')
-        user = data.get('user')
-        if BookReviewMark.objects.filter(review=review, user=user).exists():
-            raise serializers.ValidationError("You have already marked this review.")
-        return data
-
-    def create(self, validated_data):
-        return BookReviewMark.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.mark = validated_data.get('mark', instance.mark)
-        instance.save()
-        return instance
-
 
 class UserReviewSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title')  # Добавляем название книги в сериализатор
@@ -145,7 +95,10 @@ class UserReviewSerializer(serializers.ModelSerializer):
         model = BookReview
         fields = ['id', 'user', 'book_title', 'rating', 'review_text', 'review_date','book_id']  # Поля, которые должны быть включены в сериализатор
 
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'bio', 'avatar']
+
+

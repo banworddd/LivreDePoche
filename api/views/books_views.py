@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.permissions import IsAuthenticatedOrReadOnly
-from api.serializers import  BookSerializer, BookReviewSerializer, BookReviewMarkSerializer
+from api.serializers.books_serializers import  BookSerializer, BookReviewSerializer, BookReviewMarkSerializer
 from users.models import  BookReview, BookReviewMark
 from books.models import Book
 
