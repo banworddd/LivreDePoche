@@ -5,21 +5,11 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/author_detail.css' %}">
 {% endblock %}
 
-{% block title %}{{ author.name }}{% endblock %}
+{% block title %}Author Details{% endblock %}
 
 {% block content %}
-    <div class="author-page-container">
-        <!-- Заголовок страницы с именем автора -->
-        <h1 class="author-title">{{ author.name }}</h1>
-
-        <!-- Информация о годах жизни автора -->
-        <p class="author-years"><strong>Годы жизни:</strong>
-            {{ author.date_of_birth }} - {{ author.date_of_death }}
-        </p>
-
-        <!-- Биография автора -->
-        <div class="bio-container">
-            <p><strong>Биография:</strong> {{ author.bio }}</p>
-        </div>
+    <div id="author-details" class="author-page-container">
+        <h1 class="author-title">Loading...</h1>
     </div>
+    <script src="{% static 'js/author_detail.js' %}"></script>
 {% endblock %}

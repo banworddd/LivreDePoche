@@ -4,30 +4,47 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: var(--main-bg-color);
+    background-color: #ffffff; /* Белый цвет */
     padding: 20px;
     width: 100%;
     max-width: 800px; /* Ограничиваем максимальную ширину */
     margin: 20px auto; /* Центрируем контейнер по горизонтали */
     border-radius: 12px;
+}
+
+/* Блок с информацией об авторе */
+.author-info-block {
+    text-align: center;
+    background-color: #B9B9B9; /* Серый цвет */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Портрет автора */
+.author-portrait {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Заголовок страницы */
-.author-title {
-    text-align: center;
-    font-size: 28px;
+/* Имя автора */
+.author-name {
+    font-size: 24px;
     font-weight: bold;
-    color: white;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    color: #ffffff;
+    margin-bottom: 10px;
+
 }
 
 /* Информация о годах жизни автора */
 .author-years {
-    text-align: center;
     font-size: 18px;
-    color: white;
+    color: #ffffff;
     margin-bottom: 20px;
 }
 
@@ -35,7 +52,7 @@
 .bio-container {
     width: 80%;
     text-align: justify;
-    background-color: #888888;
+    background-color: #B9B9B9; /* Серый цвет */
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

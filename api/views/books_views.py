@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.permissions import IsAuthenticatedOrReadOnly
-from api.serializers.books_serializers import  BookSerializer, BookReviewSerializer, BookReviewMarkSerializer
+from api.serializers.books_serializers import  BookSerializer, BookReviewSerializer, BookReviewMarkSerializer, AuthorSerializer
 from users.models import  BookReview, BookReviewMark
-from books.models import Book
+from books.models import Book, Author
 
 from drf_yasg.utils import swagger_auto_schema
 
@@ -132,3 +132,21 @@ class BookReviewMarkAPIView(APIView):
         mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
         mark.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class AuthorDetailView(APIView):
+
+    @swagger_auto_schema(operation_description='Получает информацию об авторе по его id или список всех авторов, если id не передан')
+    def get(self, request, author_id=None):
+        if author_id:
+            # Получаем автора по ID или возвращаем 404 ошибку, если автор не найден
+            author = get_object_or_404(Author, id=author_id)
+            # Сериализуем данные автора
+            serializer = AuthorSerializer(author)
+        else:
+            # Получаем всех авторов
+            authors = Author.objects.all()
+            # Сериализуем данные всех авторов
+            serializer = AuthorSerializer(authors, many=True)
+
+        # Возвращаем сериализованные данные в ответе
+        return Response(serializer.data, status=status.HTTP_200_OK)

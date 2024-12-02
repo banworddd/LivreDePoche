@@ -60,3 +60,13 @@
     color: white;
     margin: 10px 0;
 }
+
+/* Портрет автора */
+.author-portrait {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

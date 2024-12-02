@@ -8,28 +8,11 @@
 {% endblock %}
 
 {% block content %}
-<div id="author-list-container">
-    <!-- Заголовок страницы -->
-    <h1 class="page-title">Список Авторов</h1>
-
-    <!-- Список авторов -->
-    <ul class="author-list">
-        {% for author in authors %}
-            <li class="author-card">
-                <!-- Имя автора с ссылкой -->
-                <h2 class="author-name">
-                    <a href="{% url 'author_detail' author.id %}">{{ author.name }}</a>
-                </h2>
-
-                <!-- Годы жизни автора -->
-                <p class="author-info">
-                    <strong>Годы жизни:</strong> {{ author.date_of_birth }} - {{ author.date_of_death }}
-                </p>
-
-                <!-- Краткая биография автора -->
-                <p class="author-info">{{ author.bio }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-{% endblock %}
+    <div id="author-list-container">
+        <h1 class="page-title">Loading...</h1>
+        <ul class="author-list" id="author-list">
+            <!-- Authors will be inserted here by JavaScript -->
+        </ul>
+    </div>
+    <script src="{% static 'js/authors.js' %}"></script>
+{% endblock %}  
