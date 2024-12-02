@@ -8,7 +8,7 @@ document.getElementById('registration-form').addEventListener('submit', function
             password: formData.get('password'),
         };
 
-        fetch('/api/register/', {
+        fetch('/api/users/register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

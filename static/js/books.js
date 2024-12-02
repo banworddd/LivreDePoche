@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const API_URL = "/api/books/";  // Относительный путь
+    const API_URL = "/api/books/books_list/";  // Относительный путь
     const searchInput = document.getElementById("search-input");
     const applyFiltersButton = document.getElementById("apply-filters");
     const bookList = document.getElementById("book-list");

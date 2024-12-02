@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
             formData.append('avatar', file);
 
             // Отправляем файл на сервер
-            fetch(`/api/profile/${username}/`, {
+            fetch(`/api/users/profile/${username}/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const formData = new FormData();
             formData.append('bio', newBio);
 
-            fetch(`/api/profile/${username}/`, {
+            fetch(`/api/users/profile/${username}/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Загружаем информацию о пользователе
-    fetch(`/api/profile/${username}/`)
+    fetch(`/api/users/profile/${username}/`)
         .then(response => response.json())
         .then(data => {
             document.getElementById('user-email').innerText = data.email || "Нет информации";
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Функция удаления книги
     function deleteBook(readingListId) {
-        fetch(`/api/reading_list/${username}/${readingListId}/`, {
+        fetch(`/api/users/reading_list/${username}/${readingListId}/`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': csrfToken,
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Загрузка списка чтения
-    fetch(`/api/reading_list/${username}/`)
+    fetch(`/api/users/reading_list/${username}/`)
         .then(response => response.json())
         .then(data => {
             const currentlyReadingList = document.getElementById('currently-reading-list');
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 completedList.innerHTML = '<li>Нет завершенных книг.</li>';
                 toReadList.innerHTML = '<li>Нет книг, которые планируете прочитать.</li>';
             } else {
-                const bookRequests = data.map(item => fetch(`/api/book/${item.book}/`));
+                const bookRequests = data.map(item => fetch(`/api/books/book/${item.book}/`));
 
                 Promise.all(bookRequests)
                     .then(responses => Promise.all(responses.map(res => res.json())))
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Показать загрузку, пока данные не загружены
     loadingItem.innerHTML = 'Загрузка...';
 
-    fetch(`/api/user_reviews/${username}/`)  // Используем переменную username для URL
+    fetch(`/api/users/user_reviews/${username}/`)  // Используем переменную username для URL
         .then(response => response.json())
         .then(data => {
             reviewsList.innerHTML = ''; // Очищаем список

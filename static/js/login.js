@@ -7,7 +7,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
             password: formData.get('password'),
         };
 
-        fetch('/api/login/', {
+        fetch('/api/users/login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

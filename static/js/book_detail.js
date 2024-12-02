@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let selectedRating = 0;
 
     function fetchBookDetails() {
-        fetch(`/api/book/${bookId}/`)
+        fetch(`/api/books/book/${bookId}/`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('book-title').textContent = data.title;
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function fetchReviews() {
-        fetch(`/api/book/${bookId}/reviews/`)
+        fetch(`/api/books/book/${bookId}/reviews/`)
             .then(response => response.json())
             .then(data => {
                 reviewsList.innerHTML = "";
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     reviewsList.appendChild(reviewItem);
 
                     // Fetch like and dislike counts for the review
-                    fetch(`/api/bookreviewmarks/?review=${review.id}`)
+                    fetch(`/api/books/bookreviewmarks/?review=${review.id}`)
                         .then(response => response.json())
                         .then(marks => {
                             const likeCount = marks.filter(mark => mark.mark === 'like').length;
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
             review_text: reviewText
         };
 
-        fetch(`/api/book/${bookId}/reviews/`, {
+        fetch(`/api/books/book/${bookId}/reviews/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function() {
             review_text: reviewText
         };
 
-        fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
+        fetch(`/api/books/book/${bookId}/reviews/${reviewId}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -279,14 +279,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function deleteReview(reviewId) {
-        fetch(`/api/book/${bookId}/reviews/${reviewId}/`, {
+        fetch(`/api/books/book/${bookId}/reviews/${reviewId}/`, {
             method: 'DELETE',
             headers: { 'X-CSRFToken': getCookie('csrftoken') },
         }).then(() => fetchReviews());
     }
 
     function toggleMark(reviewId, markType, likeButton, dislikeButton) {
-        const url = `/api/bookreviewmarks/?review=${reviewId}&user=${username}`;
+        const url = `/api/books/bookreviewmarks/?review=${reviewId}&user=${username}`;
 
         fetch(url)
             .then(response => response.json())
@@ -294,12 +294,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (data.length > 0) {
                     // If a mark already exists, update it
                     const markId = data[0].id;
-                    const updateUrl = `/api/bookreviewmarks/${reviewId}/update/`;
+                    const updateUrl = `/api/books/bookreviewmarks/${reviewId}/update/`;
                     const updateData = { mark: markType };
 
                     if (data[0].mark === markType) {
                         // If the same mark is clicked again, delete the mark
-                        fetch(`/api/bookreviewmarks/${reviewId}/delete/`, {
+                        fetch(`/api/books/bookreviewmarks/${reviewId}/delete/`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -354,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         mark: markType
                     };
 
-                    fetch('/api/bookreviewmarks/', {
+                    fetch('/api/books/bookreviewmarks/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function updateMarkCounts(reviewId) {
-        fetch(`/api/bookreviewmarks/?review=${reviewId}`)
+        fetch(`/api/books/bookreviewmarks/?review=${reviewId}`)
             .then(response => response.json())
             .then(marks => {
                 const likeCount = marks.filter(mark => mark.mark === 'like').length;
@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function addToReadingList(event) {
         const status = event.target.getAttribute('data-status');
-        const url = `/api/reading_list/${username}/`;
+        const url = `/api/users/reading_list/${username}/`;
         const data = {
             book: bookId,
             status: status

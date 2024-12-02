@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById('search-input');
 
     function fetchUsers() {
-        fetch('/api/user_list/')
+        fetch('/api/users/user_list/')
             .then(response => response.json())
             .then(data => {
                 renderUsers(data);
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function filterUsers(query) {
-        fetch('/api/user_list/')
+        fetch('/api/users/user_list/')
             .then(response => response.json())
             .then(data => {
                 const filteredUsers = data.filter(user =>
