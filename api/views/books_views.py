@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -93,45 +93,48 @@ class BookListView(APIView):
 
 
 class BookReviewMarkAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    @swagger_auto_schema(operation_description='Получает список оценок на отзыв')
-    def get(self, request):
-        review_id = request.query_params.get('review')
-        if review_id:
-            marks = BookReviewMark.objects.filter(review_id=review_id)
+    def get(self, request, review_id, pk=None):
+        review = get_object_or_404(BookReview, id=review_id)
+        if pk:
+            mark = get_object_or_404(BookReviewMark, id=pk, review=review)
+            serializer = BookReviewMarkSerializer(mark)
+            return Response(serializer.data)
         else:
-            marks = BookReviewMark.objects.all()
-        serializer = BookReviewMarkSerializer(marks, many=True)
-        return Response(serializer.data)
+            marks = BookReviewMark.objects.filter(review=review)
+            serializer = BookReviewMarkSerializer(marks, many=True)
 
-    @swagger_auto_schema(operation_description='Добавляет оценку на отзыв по по id пользователя')
-    def post(self, request):
-        data = request.data.copy()
-        data['user'] = request.user.id
-        serializer = BookReviewMarkSerializer(data=data)
+            likes_count = marks.filter(mark=BookReviewMark.LIKE).count()
+            dislikes_count = marks.filter(mark=BookReviewMark.DISLIKE).count()
+
+            return Response({
+                'marks': serializer.data,
+                'likes_count': likes_count,
+                'dislikes_count': dislikes_count
+            })
+
+    def post(self, request, review_id):
+        review = get_object_or_404(BookReview, id=review_id)
+        serializer = BookReviewMarkSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(review=review, user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(operation_description='Меняет оценку на отзыв по по id пользователя')
-    def put(self, request, review_id):
+    def patch(self, request, review_id, pk):
         review = get_object_or_404(BookReview, id=review_id)
-        mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
-        data = request.data.copy()
-        serializer = BookReviewMarkSerializer(mark, data=data, partial=True)
+        mark = get_object_or_404(BookReviewMark, id=pk, review=review, user=request.user)
+        serializer = BookReviewMarkSerializer(mark, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(operation_description='Удаляет оценку на отзыв по по id пользователя')
-    def delete(self, request, review_id):
+    def delete(self, request, review_id, pk):
         review = get_object_or_404(BookReview, id=review_id)
-        mark = get_object_or_404(BookReviewMark, review=review, user=request.user)
+        mark = get_object_or_404(BookReviewMark, id=pk, review=review, user=request.user)
         mark.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class AuthorDetailView(APIView):
 
@@ -150,3 +153,14 @@ class AuthorDetailView(APIView):
 
         # Возвращаем сериализованные данные в ответе
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BookAuthorListView(generics.ListAPIView):
+    serializer_class = BookSerializer
+
+    def get_queryset(self):
+        queryset = Book.objects.all()
+        author_id = self.request.query_params.get('author_id')
+        if author_id is not None:
+            queryset = queryset.filter(authors__id=author_id)
+        return queryset

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from users.models import BookReview, BookReviewMark
 from books.models import Book, Author, Genre
 
+
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
@@ -22,6 +23,7 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = '__all__'
+
 
 class BookReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)  # Возвращает имя пользователя

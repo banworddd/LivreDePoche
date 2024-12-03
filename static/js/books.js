@@ -37,8 +37,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p><strong>Авторы:</strong> ${book.authors.map(author => author.name).join(", ")}</p>
                 <p><strong>Жанры:</strong> ${book.genre.map(genre => genre.name).join(", ")}</p>
                 <p>${book.summary}</p>
+                <div id="rating-${book.id}" class="rating">Загрузка рейтинга...</div>
             `;
             bookList.appendChild(listItem);
+
+            // Формируем URL для запроса к API рейтинга книги
+            const ratingApiUrl = `/api/users/rating_reviews/${book.id}/`;
+
+            // Отправляем запрос к API рейтинга книги
+            fetch(ratingApiUrl)
+                .then(response => response.json())
+                .then(ratingData => {
+                    const ratingContainer = document.getElementById(`rating-${book.id}`);
+                    if (ratingData.average_rating !== null) {
+                        ratingContainer.innerHTML = `Средний рейтинг: ${ratingData.average_rating.toFixed(2)}`;
+                    } else {
+                        ratingContainer.innerHTML = 'Рейтинг еще не сформирован';
+                    }
+                })
+                .catch(error => {
+                    console.error(`Ошибка при загрузке рейтинга для книги ${book.id}:`, error);
+                    const ratingContainer = document.getElementById(`rating-${book.id}`);
+                    ratingContainer.innerHTML = 'Ошибка загрузки рейтинга';
+                });
         });
     };
 

@@ -18,7 +18,6 @@ class Author(models.Model):
         verbose_name_plural = "Авторы"
 
     def __str__(self):
-        """Возвращает строковое представление автора."""
         return f"{self.first_name} {self.middle_name} {self.last_name}".strip()
 
 
@@ -27,8 +26,11 @@ class Genre(models.Model):
 
     name = models.CharField(max_length=100)  # Название жанра
 
+    class Meta:
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
+
     def __str__(self):
-        """Возвращает строковое представление жанра."""
         return self.name
 
 
@@ -40,7 +42,12 @@ class Book(models.Model):
     genre = models.ManyToManyField(Genre)  # Связь с жанрами
     summary = models.CharField(max_length=150)  # Краткое описание книги
     description = models.TextField(max_length=500)  # Полное описание книги
+    year = models.PositiveSmallIntegerField(null=True, blank=True) #Год написания книги
+    cover = models.ImageField(upload_to='covers/', default='covers/default.png')
+
+    class Meta:
+        verbose_name = "Книга"
+        verbose_name_plural = "Книги"
 
     def __str__(self):
-        """Возвращает строковое представление книги."""
         return self.title

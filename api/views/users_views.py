@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
+from django.db.models import Avg
 from django.utils import timezone
 
 
@@ -162,6 +163,22 @@ class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserListSerializer
 
+
+class BookReviewsAndAverageRatingView(generics.ListAPIView):
+    serializer_class = UserReviewSerializer
+
+    def get_queryset(self):
+        book_id = self.kwargs.get('book_id')
+        return BookReview.objects.filter(book_id=book_id)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        average_rating = queryset.aggregate(Avg('rating'))['rating__avg']
+        return Response({
+            'reviews': serializer.data,
+            'average_rating': average_rating
+        })
 
 
 

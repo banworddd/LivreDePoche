@@ -13,6 +13,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('book-title').textContent = data.title;
                 document.getElementById('book-author').textContent = data.authors.length > 0 ? data.authors[0].name : 'Неизвестный автор';
                 document.getElementById('book-description').textContent = data.description;
+
+                // Формируем URL для запроса к API рейтинга книги
+                const ratingApiUrl = `/api/users/rating_reviews/${bookId}/`;
+
+                // Отправляем запрос к API рейтинга книги
+                fetch(ratingApiUrl)
+                    .then(response => response.json())
+                    .then(ratingData => {
+                        const ratingContainer = document.createElement('div');
+                        ratingContainer.classList.add('rating');
+                        if (ratingData.average_rating !== null) {
+                            ratingContainer.innerHTML = `Средний рейтинг: ${ratingData.average_rating.toFixed(2)}`;
+                        } else {
+                            ratingContainer.innerHTML = 'Рейтинг еще не сформирован';
+                        }
+                        document.querySelector('.book-detail-container').appendChild(ratingContainer);
+                    })
+                    .catch(error => {
+                        console.error(`Ошибка при загрузке рейтинга для книги ${bookId}:`, error);
+                    });
             })
             .catch(error => {
                 console.error("Ошибка при загрузке данных о книге:", error);
@@ -87,16 +107,16 @@ document.addEventListener("DOMContentLoaded", function() {
                     reviewsList.appendChild(reviewItem);
 
                     // Fetch like and dislike counts for the review
-                    fetch(`/api/books/bookreviewmarks/?review=${review.id}`)
+                    fetch(`/api/books/reviews/${review.id}/marks/`)
                         .then(response => response.json())
-                        .then(marks => {
-                            const likeCount = marks.filter(mark => mark.mark === 'like').length;
-                            const dislikeCount = marks.filter(mark => mark.mark === 'dislike').length;
+                        .then(data => {
+                            const likeCount = data.likes_count;
+                            const dislikeCount = data.dislikes_count;
                             reviewItem.querySelector('.like-count').textContent = likeCount;
                             reviewItem.querySelector('.dislike-count').textContent = dislikeCount;
 
                             // Check if the user has already marked this review
-                            const userMark = marks.find(mark => mark.user === username);
+                            const userMark = data.marks.find(mark => mark.user === username);
                             if (userMark) {
                                 if (userMark.mark === 'like') {
                                     reviewItem.querySelector('.like-button').classList.add('marked');
@@ -286,20 +306,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function toggleMark(reviewId, markType, likeButton, dislikeButton) {
-        const url = `/api/books/bookreviewmarks/?review=${reviewId}&user=${username}`;
+        const url = `/api/books/reviews/${reviewId}/marks/`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                if (data.length > 0) {
+                if (data.marks.length > 0) {
                     // If a mark already exists, update it
-                    const markId = data[0].id;
-                    const updateUrl = `/api/books/bookreviewmarks/${reviewId}/update/`;
+                    const markId = data.marks[0].id;
+                    const updateUrl = `/api/books/reviews/${reviewId}/marks/${markId}/`;
                     const updateData = { mark: markType };
 
-                    if (data[0].mark === markType) {
+                    if (data.marks[0].mark === markType) {
                         // If the same mark is clicked again, delete the mark
-                        fetch(`/api/books/bookreviewmarks/${reviewId}/delete/`, {
+                        fetch(updateUrl, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -321,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     } else {
                         // If a different mark is clicked, update the mark
                         fetch(updateUrl, {
-                            method: 'PUT',
+                            method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRFToken': getCookie('csrftoken'),
@@ -350,11 +370,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     // If no mark exists, create a new one
                     const createData = {
+                        mark: markType,
                         review: reviewId,
-                        mark: markType
+                        user: username
                     };
 
-                    fetch('/api/books/bookreviewmarks/', {
+                    fetch(url, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -388,11 +409,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function updateMarkCounts(reviewId) {
-        fetch(`/api/books/bookreviewmarks/?review=${reviewId}`)
+        fetch(`/api/books/reviews/${reviewId}/marks/`)
             .then(response => response.json())
-            .then(marks => {
-                const likeCount = marks.filter(mark => mark.mark === 'like').length;
-                const dislikeCount = marks.filter(mark => mark.mark === 'dislike').length;
+            .then(data => {
+                const likeCount = data.likes_count;
+                const dislikeCount = data.dislikes_count;
                 const reviewItem = document.querySelector(`[data-review-id="${reviewId}"]`).parentElement;
                 reviewItem.querySelector('.like-count').textContent = likeCount;
                 reviewItem.querySelector('.dislike-count').textContent = dislikeCount;

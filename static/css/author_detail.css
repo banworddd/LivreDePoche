@@ -38,7 +38,6 @@
     font-weight: bold;
     color: #ffffff;
     margin-bottom: 10px;
-
 }
 
 /* Информация о годах жизни автора */
@@ -62,4 +61,68 @@
     font-size: 16px;
     color: white;
     margin: 10px 0;
+}
+
+/* Контейнер для книг */
+.books-container {
+    width: 100%;
+    background-color: #B9B9B9; /* Серый цвет */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: center; /* Центрируем текст */
+}
+
+/* Заголовок списка книг */
+.books-container h2 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Список книг */
+.books-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Элемент списка книг */
+.books-list li {
+    margin-bottom: 20px;
+}
+
+/* Блок книги */
+.book-block {
+    background-color: #888888; /* Темно-серый цвет */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Центрируем текст */
+}
+
+/* Ссылка на книгу */
+.book-block a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    transition: font-size 0.3s ease;
+}
+
+/* Эффект увеличения ссылки при наведении */
+.book-block a:hover {
+    font-size: 20px;
+}
+
+/* Краткое описание книги */
+.book-block p {
+    font-size: 16px;
+    color: white;
+    margin: 10px 0;
+}
+
+/* Контейнер для рейтинга */
+.rating {
+    margin-top: 10px;
+    font-size: 16px;
+    color: white;
 }
