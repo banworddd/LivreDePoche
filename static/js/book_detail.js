@@ -99,34 +99,27 @@ document.addEventListener("DOMContentLoaded", function() {
                         <strong><a href="/users/profile/${review.user}/" class="username-link">${review.user}</a></strong></strong>  ${generateStars(review.rating)}
                         <br><br><p>${review.review_text}</p><br>
                         <small>Дата: ${new Date(review.review_date).toLocaleDateString()}</small>
-                        <div class="like-dislike-buttons">
-                            <button class="like-button btn" data-review-id="${review.id}"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
-                            <button class="dislike-button btn" data-review-id="${review.id}"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
+                        <div class="like-button-container">
+                            <button class="like-button btn" data-review-id="${review.id}"><i class="fas fa-heart"></i> <span class="like-count">0</span></button>
                         </div>
                     `;
                     reviewsList.appendChild(reviewItem);
 
-                    // Fetch like and dislike counts for the review
-                    fetch(`/api/books/reviews/${review.id}/marks/`)
+                    // Fetch like count for the review
+                    fetch(`/api/books/reviews/${review.id}/likes/`)
                         .then(response => response.json())
                         .then(data => {
-                            const likeCount = data.likes_count;
-                            const dislikeCount = data.dislikes_count;
+                            const likeCount = data.length;
                             reviewItem.querySelector('.like-count').textContent = likeCount;
-                            reviewItem.querySelector('.dislike-count').textContent = dislikeCount;
 
-                            // Check if the user has already marked this review
-                            const userMark = data.marks.find(mark => mark.user === username);
-                            if (userMark) {
-                                if (userMark.mark === 'like') {
-                                    reviewItem.querySelector('.like-button').classList.add('marked');
-                                } else if (userMark.mark === 'dislike') {
-                                    reviewItem.querySelector('.dislike-button').classList.add('marked');
-                                }
+                            // Check if the user has already liked this review
+                            const userLike = data.find(like => like.user === username);
+                            if (userLike) {
+                                reviewItem.querySelector('.like-button').classList.add('liked');
                             }
                         })
                         .catch(error => {
-                            console.error("Ошибка при загрузке оценок:", error);
+                            console.error("Ошибка при загрузке лайков:", error);
                         });
                 });
 
@@ -164,19 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 likeButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const reviewId = button.getAttribute('data-review-id');
-                        const likeButton = button;
-                        const dislikeButton = button.nextElementSibling;
-                        toggleMark(reviewId, 'like', likeButton, dislikeButton);
-                    });
-                });
-
-                const dislikeButtons = document.querySelectorAll('.dislike-button');
-                dislikeButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const reviewId = button.getAttribute('data-review-id');
-                        const dislikeButton = button;
-                        const likeButton = button.previousElementSibling;
-                        toggleMark(reviewId, 'dislike', likeButton, dislikeButton);
+                        toggleLike(reviewId, button);
                     });
                 });
             })
@@ -305,72 +286,39 @@ document.addEventListener("DOMContentLoaded", function() {
         }).then(() => fetchReviews());
     }
 
-    function toggleMark(reviewId, markType, likeButton, dislikeButton) {
-        const url = `/api/books/reviews/${reviewId}/marks/`;
+    function toggleLike(reviewId, button) {
+        const url = `/api/books/reviews/${reviewId}/likes/`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                if (data.marks.length > 0) {
-                    // If a mark already exists, update it
-                    const markId = data.marks[0].id;
-                    const updateUrl = `/api/books/reviews/${reviewId}/marks/${markId}/`;
-                    const updateData = { mark: markType };
+                const userLike = data.find(like => like.user === username);
+                if (userLike) {
+                    // If a like already exists, delete it
+                    const likeId = userLike.id;
+                    const deleteUrl = `/api/books/reviews/${reviewId}/likes/${likeId}/`;
 
-                    if (data.marks[0].mark === markType) {
-                        // If the same mark is clicked again, delete the mark
-                        fetch(updateUrl, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken'),
-                            },
-                        })
-                        .then(response => {
-                            if (response.status === 204) {
-                                likeButton.classList.remove('marked');
-                                dislikeButton.classList.remove('marked');
-                                updateMarkCounts(reviewId);
-                            } else {
-                                console.error('Ошибка при удалении оценки:', data);
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Ошибка при удалении оценки:", error);
-                        });
-                    } else {
-                        // If a different mark is clicked, update the mark
-                        fetch(updateUrl, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken'),
-                            },
-                            body: JSON.stringify(updateData)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.id) {
-                                likeButton.classList.remove('marked');
-                                dislikeButton.classList.remove('marked');
-                                if (markType === 'like') {
-                                    likeButton.classList.add('marked');
-                                } else if (markType === 'dislike') {
-                                    dislikeButton.classList.add('marked');
-                                }
-                                updateMarkCounts(reviewId);
-                            } else {
-                                console.error('Ошибка при обновлении оценки:', data);
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Ошибка при обновлении оценки:", error);
-                        });
-                    }
+                    fetch(deleteUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 204) {
+                            button.classList.remove('liked');
+                            updateLikeCount(reviewId);
+                        } else {
+                            console.error('Ошибка при удалении лайка:', data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Ошибка при удалении лайка:", error);
+                    });
                 } else {
-                    // If no mark exists, create a new one
+                    // If no like exists, create a new one
                     const createData = {
-                        mark: markType,
                         review: reviewId,
                         user: username
                     };
@@ -386,40 +334,32 @@ document.addEventListener("DOMContentLoaded", function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.id) {
-                            likeButton.classList.remove('marked');
-                            dislikeButton.classList.remove('marked');
-                            if (markType === 'like') {
-                                likeButton.classList.add('marked');
-                            } else if (markType === 'dislike') {
-                                dislikeButton.classList.add('marked');
-                            }
-                            updateMarkCounts(reviewId);
+                            button.classList.add('liked');
+                            updateLikeCount(reviewId);
                         } else {
-                            console.error('Ошибка при добавлении оценки:', data);
+                            console.error('Ошибка при добавлении лайка:', data);
                         }
                     })
                     .catch(error => {
-                        console.error("Ошибка при отправке оценки:", error);
+                        console.error("Ошибка при отправке лайка:", error);
                     });
                 }
             })
             .catch(error => {
-                console.error("Ошибка при проверке существующей оценки:", error);
+                console.error("Ошибка при проверке существующего лайка:", error);
             });
     }
 
-    function updateMarkCounts(reviewId) {
-        fetch(`/api/books/reviews/${reviewId}/marks/`)
+    function updateLikeCount(reviewId) {
+        fetch(`/api/books/reviews/${reviewId}/likes/`)
             .then(response => response.json())
             .then(data => {
-                const likeCount = data.likes_count;
-                const dislikeCount = data.dislikes_count;
+                const likeCount = data.length;
                 const reviewItem = document.querySelector(`[data-review-id="${reviewId}"]`).parentElement;
                 reviewItem.querySelector('.like-count').textContent = likeCount;
-                reviewItem.querySelector('.dislike-count').textContent = dislikeCount;
             })
             .catch(error => {
-                console.error("Ошибка при обновлении счетчиков:", error);
+                console.error("Ошибка при обновлении счетчика лайков:", error);
             });
     }
 

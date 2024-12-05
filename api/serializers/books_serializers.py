@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from users.models import BookReview, BookReviewMark
+from users.models import BookReview, ReviewLike
 from books.models import Book, Author, Genre
 
 
@@ -33,23 +33,12 @@ class BookReviewSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'rating', 'review_text', 'review_date']
         read_only_fields = ['id', 'user', 'review_date']
 
+class ReviewLikeSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)  # Возвращает имя пользователя
 
-class BookReviewMarkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BookReviewMark
-        fields = '__all__'
+        model = ReviewLike
+        fields = ['id', 'user', 'review', 'like_date']
+        read_only_fields = ['id', 'user', 'like_date']
 
-    def validate(self, data):
-        review = data.get('review')
-        user = data.get('user')
-        if BookReviewMark.objects.filter(review=review, user=user).exists():
-            raise serializers.ValidationError("You have already marked this review.")
-        return data
 
-    def create(self, validated_data):
-        return BookReviewMark.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.mark = validated_data.get('mark', instance.mark)
-        instance.save()
-        return instance

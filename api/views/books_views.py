@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.permissions import IsAuthenticatedOrReadOnly
-from api.serializers.books_serializers import  BookSerializer, BookReviewSerializer, BookReviewMarkSerializer, AuthorSerializer
-from users.models import  BookReview, BookReviewMark
+from api.serializers.books_serializers import  BookSerializer, BookReviewSerializer, ReviewLikeSerializer, AuthorSerializer
+from users.models import  BookReview, ReviewLike
 from books.models import Book, Author
 
 from drf_yasg.utils import swagger_auto_schema
@@ -92,49 +92,37 @@ class BookListView(APIView):
         return Response(serializer.data)
 
 
-class BookReviewMarkAPIView(APIView):
-    def get(self, request, review_id, pk=None):
-        review = get_object_or_404(BookReview, id=review_id)
-        if pk:
-            mark = get_object_or_404(BookReviewMark, id=pk, review=review)
-            serializer = BookReviewMarkSerializer(mark)
-            return Response(serializer.data)
+class ReviewLikeAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, review_id, like_id=None):
+        if like_id:
+            try:
+                like = ReviewLike.objects.get(id=like_id, review_id=review_id)
+                serializer = ReviewLikeSerializer(like)
+                return Response(serializer.data)
+            except ReviewLike.DoesNotExist:
+                return Response({"detail": "Like not found."}, status=status.HTTP_404_NOT_FOUND)
         else:
-            marks = BookReviewMark.objects.filter(review=review)
-            serializer = BookReviewMarkSerializer(marks, many=True)
-
-            likes_count = marks.filter(mark=BookReviewMark.LIKE).count()
-            dislikes_count = marks.filter(mark=BookReviewMark.DISLIKE).count()
-
-            return Response({
-                'marks': serializer.data,
-                'likes_count': likes_count,
-                'dislikes_count': dislikes_count
-            })
+            likes = ReviewLike.objects.filter(review_id=review_id)
+            serializer = ReviewLikeSerializer(likes, many=True)
+            return Response(serializer.data)
 
     def post(self, request, review_id):
-        review = get_object_or_404(BookReview, id=review_id)
-        serializer = BookReviewMarkSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(review=review, user=request.user)
+        review = BookReview.objects.get(id=review_id)
+        like, created = ReviewLike.objects.get_or_create(user=request.user, review=review)
+        if created:
+            serializer = ReviewLikeSerializer(like)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Like already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request, review_id, pk):
-        review = get_object_or_404(BookReview, id=review_id)
-        mark = get_object_or_404(BookReviewMark, id=pk, review=review, user=request.user)
-        serializer = BookReviewMarkSerializer(mark, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, review_id, pk):
-        review = get_object_or_404(BookReview, id=review_id)
-        mark = get_object_or_404(BookReviewMark, id=pk, review=review, user=request.user)
-        mark.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+    def delete(self, request, review_id, like_id):
+        try:
+            like = ReviewLike.objects.get(id=like_id, review_id=review_id, user=request.user)
+            like.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ReviewLike.DoesNotExist:
+            return Response({"detail": "Like not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class AuthorDetailView(APIView):
 
