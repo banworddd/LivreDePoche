@@ -57,43 +57,14 @@ class BookReviewView(APIView):
 
 class BookListView(APIView):
 
-    @swagger_auto_schema(operation_description='Получаем список книг из модели Books, с возможностью фильтрации ')
+    @swagger_auto_schema(operation_description='Получаем список книг из модели Books')
     def get(self, request):
-        # Получаем параметры фильтрации из запроса
-        author_name = request.GET.get('author', None)
-        genre_name = request.GET.get('genre', None)
-        search_query = request.GET.get('search', None)
-
         books = Book.objects.all()
-
-        # Фильтрация по автору
-        if author_name:
-            author_name = author_name.strip()  # Убираем лишние пробелы
-            books = books.filter(authors__name__icontains=author_name)
-
-        # Фильтрация по жанру
-        if genre_name:
-            genre_name = genre_name.strip()  # Убираем лишние пробелы
-            books = books.filter(genre__name__icontains=genre_name)
-
-        # Фильтрация по поисковому запросу
-        if search_query:
-            search_query = search_query.strip()  # Убираем лишние пробелы
-            query = Q()
-            for keyword in search_query.split():  # Разделяем поисковую строку на слова
-                query |= Q(title__icontains=keyword) | Q(authors__name__icontains=keyword) | Q(genre__name__icontains=keyword)
-            books = books.filter(query)
-
-        # Применяем distinct, чтобы избежать повторений
-        books = books.distinct()
-
-        # Сериализация данных и возвращение ответа
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
 
-
 class ReviewLikeAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request, review_id, like_id=None):
         if like_id:

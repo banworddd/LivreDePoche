@@ -9,20 +9,10 @@
 
 {% block content %}
 <div class="books-page-container">
-    <!-- Блок с заголовком и поиском -->
-    <div class="search-filters-container">
-        <h1 class="page-title">Список книг</h1>
-        <div class="search-filters">
-            <!-- Поле поиска -->
-            <input id="search-input" type="text" class="form-control search-input" placeholder="Введите название, автора или жанр" />
-            <!-- Кнопка поиска -->
-            <button id="apply-filters" class="btn btn-light">
-                <i class="bi bi-search"></i> <!-- Иконка поиска -->
-            </button>
-        </div>
-    </div>
     <!-- Блок с книгами -->
     <div class="book-list-container">
+        <h1 class="page-title">Список книг</h1>
+        <br>
         <ul id="book-list" class="book-list">
             <!-- Книги будут загружены через JS -->
         </ul>

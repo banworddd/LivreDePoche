@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(data => {
                 document.getElementById('book-title').textContent = data.title;
-                document.getElementById('book-author').textContent = data.authors.length > 0 ? data.authors[0].name : 'Неизвестный автор';
+                document.getElementById('book-author').textContent = data.authors.map(author => `${author.first_name} ${author.middle_name} ${author.last_name}`.trim()).join(", ");
                 document.getElementById('book-description').textContent = data.description;
 
                 // Формируем URL для запроса к API рейтинга книги
