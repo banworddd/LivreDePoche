@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from users.models import CustomUser,ReadingList, BookReview
+from users.models import CustomUser,ReadingList, BookReview, FriendsList
 from books.models import Book
 
 
@@ -100,5 +100,14 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'bio', 'avatar']
+
+
+class FriendsListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    friend = UserSerializer()
+
+    class Meta:
+        model = FriendsList
+        fields = '__all__'
 
 

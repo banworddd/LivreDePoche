@@ -4,14 +4,14 @@ from django.db.models import Avg
 from django.utils import timezone
 
 from rest_framework import status
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from api.permissions import IsAuthenticatedOrReadOnly
-from api.serializers.users_serializers import UserSerializer, LoginSerializer, ReadingListSerializer,  UserReviewSerializer, UserListSerializer
-from users.models import CustomUser, ReadingList, BookReview
+from api.serializers.users_serializers import UserSerializer, LoginSerializer, ReadingListSerializer,  UserReviewSerializer, UserListSerializer, FriendsListSerializer
+from users.models import CustomUser, ReadingList, BookReview, FriendsList
 from api.utils import send_welcome_email
 
 from drf_yasg.utils import swagger_auto_schema
@@ -164,6 +164,70 @@ class UserBookReviewsView(APIView):
         else:
             return Response({"detail": "Отзывы не найдены."}, status=status.HTTP_404_NOT_FOUND)
 
+
+class FriendsListView(ListAPIView):
+    serializer_class = FriendsListSerializer
+
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+        return FriendsList.objects.filter(user__username=username) | FriendsList.objects.filter(friend__username=username)
+
+
+class SendFriendRequestView(CreateAPIView):
+    queryset = FriendsList.objects.all()
+    serializer_class = FriendsListSerializer
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        friend_id = request.data.get('friend_id')
+
+        if not friend_id:
+            return Response({"detail": "Friend ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            friend = CustomUser.objects.get(id=friend_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "Friend not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if FriendsList.objects.filter(user=user, friend=friend, status='waiting').exists():
+            return Response({"detail": "Friend request already sent."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if FriendsList.objects.filter(user=user, friend=friend, status='accepted').exists():
+            return Response({"detail": "You are already friends."}, status=status.HTTP_400_BAD_REQUEST)
+
+        friend_request = FriendsList.objects.create(user=user, friend=friend, status='waiting')
+        serializer = FriendsListSerializer(friend_request)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AcceptFriendRequestView(UpdateAPIView):
+    queryset = FriendsList.objects.all()
+    serializer_class = FriendsListSerializer
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        friend_request_id = kwargs.get('pk')
+
+        try:
+            friend_request = FriendsList.objects.get(id=friend_request_id, friend=user, status='waiting')
+        except FriendsList.DoesNotExist:
+            return Response({"detail": "Friend request not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        friend_request.status = 'accepted'
+        friend_request.save()
+
+        serializer = FriendsListSerializer(friend_request)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class DeleteFriendRequestView(DestroyAPIView):
+    queryset = FriendsList.objects.all()
+    serializer_class = FriendsListSerializer
+    lookup_field = 'id'
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
