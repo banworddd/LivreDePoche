@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
 
-from rest_framework import status, permissions, generics
+from rest_framework import status
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,12 +13,24 @@ from books.models import Book, Author
 from drf_yasg.utils import swagger_auto_schema
 
 
-class BookView(APIView):
-    @swagger_auto_schema(operation_description='Получает запись из модели Book')
-    def get(self, request, book_id):
-        book = get_object_or_404(Book, id=book_id)
-        serializer = BookSerializer(book)
-        return Response(serializer.data)
+class BookView(RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    lookup_url_kwarg = 'book_id'
+
+
+class BookListView(ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class BookAuthorListView(ListAPIView):
+    serializer_class = BookSerializer
+
+    def get_queryset(self):
+        queryset = Book.objects.all()
+        author_id = self.request.query_params.get('author_id')
+        queryset = queryset.filter(authors__id=author_id)
+        return queryset
 
 
 class BookReviewView(APIView):
@@ -55,16 +67,8 @@ class BookReviewView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class BookListView(APIView):
-
-    @swagger_auto_schema(operation_description='Получаем список книг из модели Books')
-    def get(self, request):
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data)
-
 class ReviewLikeAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, review_id, like_id=None):
         if like_id:
@@ -95,6 +99,7 @@ class ReviewLikeAPIView(APIView):
         except ReviewLike.DoesNotExist:
             return Response({"detail": "Like not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 class AuthorDetailView(APIView):
 
     @swagger_auto_schema(operation_description='Получает информацию об авторе по его id или список всех авторов, если id не передан')
@@ -114,12 +119,3 @@ class AuthorDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class BookAuthorListView(generics.ListAPIView):
-    serializer_class = BookSerializer
-
-    def get_queryset(self):
-        queryset = Book.objects.all()
-        author_id = self.request.query_params.get('author_id')
-        if author_id is not None:
-            queryset = queryset.filter(authors__id=author_id)
-        return queryset
