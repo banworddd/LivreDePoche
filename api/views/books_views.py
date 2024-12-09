@@ -23,9 +23,11 @@ class BookListView(ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
+
 class BookAuthorListView(ListAPIView):
     serializer_class = BookSerializer
 
+    @swagger_auto_schema(operation_description='Получает список книг автора по его id')
     def get_queryset(self):
         queryset = Book.objects.all()
         author_id = self.request.query_params.get('author_id')
@@ -70,6 +72,7 @@ class BookReviewView(APIView):
 class ReviewLikeAPIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    @swagger_auto_schema(operation_description='Возвращает либо конкретный лайк по его like_id, либо все лайки для данного отзыва по его review_id ')
     def get(self, request, review_id, like_id=None):
         if like_id:
             try:
@@ -83,6 +86,7 @@ class ReviewLikeAPIView(APIView):
             serializer = ReviewLikeSerializer(likes, many=True)
             return Response(serializer.data)
 
+    @swagger_auto_schema(operation_description='Создает лайк на отзыв, если он не существует у пользователя')
     def post(self, request, review_id):
         review = BookReview.objects.get(id=review_id)
         like, created = ReviewLike.objects.get_or_create(user=request.user, review=review)
@@ -91,6 +95,7 @@ class ReviewLikeAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({"detail": "Like already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(operation_description='Удаляет существующий у пользователя лайк')
     def delete(self, request, review_id, like_id):
         try:
             like = ReviewLike.objects.get(id=like_id, review_id=review_id, user=request.user)
@@ -105,17 +110,12 @@ class AuthorDetailView(APIView):
     @swagger_auto_schema(operation_description='Получает информацию об авторе по его id или список всех авторов, если id не передан')
     def get(self, request, author_id=None):
         if author_id:
-            # Получаем автора по ID или возвращаем 404 ошибку, если автор не найден
             author = get_object_or_404(Author, id=author_id)
-            # Сериализуем данные автора
             serializer = AuthorSerializer(author)
         else:
-            # Получаем всех авторов
             authors = Author.objects.all()
-            # Сериализуем данные всех авторов
             serializer = AuthorSerializer(authors, many=True)
 
-        # Возвращаем сериализованные данные в ответе
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

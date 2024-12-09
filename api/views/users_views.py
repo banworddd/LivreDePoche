@@ -3,23 +3,45 @@ from django.contrib.auth import login
 from django.db.models import Avg
 from django.utils import timezone
 
-
-from rest_framework import status, generics
+from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser, FormParser
-
-from drf_yasg.utils import swagger_auto_schema
 
 from api.permissions import IsAuthenticatedOrReadOnly
 from api.serializers.users_serializers import UserSerializer, LoginSerializer, ReadingListSerializer,  UserReviewSerializer, UserListSerializer
 from users.models import CustomUser, ReadingList, BookReview
 from api.utils import send_welcome_email
 
+from drf_yasg.utils import swagger_auto_schema
+
+
+class UserListView(ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserListSerializer
+
+
+class BookReviewsAndAverageRatingView(ListAPIView):
+    serializer_class = UserReviewSerializer
+
+    @swagger_auto_schema(operation_description='Возвращает набор отзывов, связанных с книгой по ее id')
+    def get_queryset(self):
+        book_id = self.kwargs.get('book_id')
+        return BookReview.objects.filter(book_id=book_id)
+
+    @swagger_auto_schema(operation_description='Возвращает список отзывов и средний рейтинг этих отзывов')
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        average_rating = queryset.aggregate(Avg('rating'))['rating__avg']
+        return Response({
+            'reviews': serializer.data,
+            'average_rating': average_rating
+        })
+
 
 class UserRegistration(APIView):
-    renderer_classes = [JSONRenderer]
 
     @swagger_auto_schema(operation_description='Создает пользователя в БД')
     def post(self, request):
@@ -38,29 +60,21 @@ class UserRegistration(APIView):
 
 
 class UserLogin(APIView):
-    renderer_classes = [JSONRenderer]
 
     @swagger_auto_schema(operation_description='Авторизирует пользователя с указанными данными')
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            # Получаем пользователя из валидированных данных
             user = serializer.validated_data['user']
-
-            # Логиним пользователя
             login(request, user)
-
-            # Возвращаем успешный ответ
             return Response({"status": "Login successful"}, status=status.HTTP_200_OK)
 
-        # Если данные не валидны, возвращаем ошибки
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class ProfileView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]  # Используйте новый класс разрешений
-    parser_classes = [MultiPartParser, FormParser]  # Поддержка загрузки файлов
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]
 
     @swagger_auto_schema(operation_description='Получает данные профиля пользователя')
     def get(self, request, username):
@@ -72,15 +86,13 @@ class ProfileView(APIView):
     def post(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
 
-        # Проверяем, является ли текущий пользователь владельцем профиля
         if user != request.user:
             return Response({'error': 'У вас нет прав на изменение этого профиля.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Обновляем данные пользователя, включая аватар и биографию
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()  # Сохраняем изменения
-            return Response(serializer.data)  # Возвращаем обновлённые данные
+            serializer.save()
+            return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -104,11 +116,9 @@ class ReadingListView(APIView):
         if not book_id or not status_name:
             return Response({"error": "Не указаны необходимые данные."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Проверка на наличие существующей записи для данной книги
         existing_entry = ReadingList.objects.filter(user=user, book_id=book_id).first()
 
         if existing_entry:
-            # Обновляем статус, если запись уже существует
             existing_entry.status = status_name
             existing_entry.read_date = timezone.now().date() if status_name == 'completed' else None
             existing_entry.save()
@@ -116,7 +126,6 @@ class ReadingListView(APIView):
             serializer = ReadingListSerializer(existing_entry)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # Если записи нет, создаем новую
         serializer = ReadingListSerializer(data={
             'user': user.id,
             'book': book_id,
@@ -135,7 +144,6 @@ class ReadingListView(APIView):
         try:
             print(f"Попытка удалить запись для пользователя {username} и записи с ID {reading_list_id}")
 
-            # Получаем запись списка чтения по ID записи и пользователю
             reading_list_entry = ReadingList.objects.get(id=reading_list_id, user__username=username)
             reading_list_entry.delete()
             print(f"Запись успешно удалена: {reading_list_entry}")
@@ -148,10 +156,8 @@ class ReadingListView(APIView):
 class UserBookReviewsView(APIView):
     @swagger_auto_schema(operation_description='Получает отзывы пользователя по его username')
     def get(self, request, username):
-        # Получаем все отзывы пользователя по его имени
         reviews = BookReview.objects.filter(user__username=username)
 
-        # Если отзывы найдены, сериализуем их
         if reviews.exists():
             serializer = UserReviewSerializer(reviews, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -159,26 +165,6 @@ class UserBookReviewsView(APIView):
             return Response({"detail": "Отзывы не найдены."}, status=status.HTTP_404_NOT_FOUND)
 
 
-class UserListView(generics.ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserListSerializer
-
-
-class BookReviewsAndAverageRatingView(generics.ListAPIView):
-    serializer_class = UserReviewSerializer
-
-    def get_queryset(self):
-        book_id = self.kwargs.get('book_id')
-        return BookReview.objects.filter(book_id=book_id)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        average_rating = queryset.aggregate(Avg('rating'))['rating__avg']
-        return Response({
-            'reviews': serializer.data,
-            'average_rating': average_rating
-        })
 
 
 
